@@ -10,11 +10,46 @@
   </div>
 
   <div class="tabs">
+    <button [class.active]="tab === 'users'" (click)="tab = 'users'">
+      All users <span class="badge" *ngIf="pendingUsers.length">{{ users.length }}</span>
+    </button>
     <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
-      Pending users <span class="badge" *ngIf="pendingUsers.length">{{ pendingUsers.length }}</span>
+      Pending users
     </button>
     <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">Pending posts</button>
-    <button [class.active]="tab === 'users'" (click)="tab = 'users'">All users</button>
+  </div>
+
+  <div *ngIf="tab === 'users'">
+    <div class="table-header">
+      <button class="btn-add" (click)="openAddModal()">Add user</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ u.accountStatus }}</td>
+          <td class="action-buttons">
+            <button class="btn-edit" (click)="editUser(u)">Edit</button>
+            <button *ngIf="u.accountStatus === 'pending'" class="btn-approve" (click)="approveUser(u)">Approve</button>
+            <button *ngIf="u.accountStatus === 'active'" class="btn-suspend" (click)="suspend(u)">Suspend</button>
+            <button *ngIf="u.accountStatus === 'suspended'" class="btn-activate" (click)="activate(u)">Activate</button>
+            <button class="btn-delete" (click)="deleteUser(u)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div *ngIf="tab === 'pendingUsers'">
@@ -47,25 +82,80 @@
     </div>
     <p class="empty" *ngIf="pending.length === 0">No posts awaiting review.</p>
   </div>
+</div>
 
-  <div *ngIf="tab === 'users'">
-    <table>
-      <thead>
-        <tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let u of users">
-          <td>{{ u.username }}</td>
-          <td>{{ u.email }}</td>
-          <td>{{ u.role }}</td>
-          <td>{{ u.accountStatus }}</td>
-          <td>
-            <button *ngIf="u.accountStatus === 'pending'" (click)="approveUser(u)">Approve</button>
-            <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">Suspend</button>
-            <button *ngIf="u.accountStatus === 'suspended'" (click)="activate(u)">Activate</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Edit user</h3>
+
+    <label>
+      Username
+      <input type="text" [(ngModel)]="editForm.username" name="username" />
+    </label>
+
+    <label>
+      Email
+      <input type="email" [(ngModel)]="editForm.email" name="email" />
+    </label>
+
+    <label>
+      Role
+      <select [(ngModel)]="editForm.role" name="role">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select [(ngModel)]="editForm.accountStatus" name="accountStatus">
+        <option value="pending">pending</option>
+        <option value="active">active</option>
+        <option value="suspended">suspended</option>
+      </select>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeEditModal()" [disabled]="saving">Cancel</button>
+      <button class="btn-save" (click)="saveEdit()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Add user</h3>
+
+    <label>
+      Username
+      <input type="text" [(ngModel)]="addForm.username" name="addUsername" />
+    </label>
+
+    <label>
+      Email
+      <input type="email" [(ngModel)]="addForm.email" name="addEmail" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" [(ngModel)]="addForm.password" name="addPassword" />
+    </label>
+
+    <label>
+      Role
+      <select [(ngModel)]="addForm.role" name="addRole">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeAddModal()" [disabled]="adding">Cancel</button>
+      <button class="btn-save" (click)="saveAddUser()" [disabled]="adding">
+        {{ adding ? 'Creating...' : 'Create user' }}
+      </button>
+    </div>
   </div>
 </div>

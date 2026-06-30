@@ -1,0 +1,17 @@
+<div class="wrap">
+  <h2>{{ auth.currentUser()?.username }}'s posts</h2>
+  <div class="card" *ngFor="let post of posts">
+    <div class="card-head">
+      <span class="status" [ngClass]="post.status">{{ post.status }}</span>
+      <span class="date">{{ post.createdAt | date: 'medium' }}</span>
+    </div>
+    <p class="desc" *ngIf="post.description">{{ post.description }}</p>
+    <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
+    <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+    <p class="rejection" *ngIf="post.status === 'rejected'">
+      Reason: {{ post.rejectionReason }}
+    </p>
+    <button class="delete" (click)="remove(post)">Delete</button>
+  </div>
+  <p class="empty" *ngIf="posts.length === 0">You haven't posted anything yet.</p>
+</div>

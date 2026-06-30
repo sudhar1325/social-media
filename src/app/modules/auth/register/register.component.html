@@ -1,0 +1,20 @@
+<div class="auth-wrap">
+  <form class="auth-card" *ngIf="!submitted" (ngSubmit)="submit()">
+    <h2>Create your account</h2>
+    <label>Username</label>
+    <input [(ngModel)]="username" name="username" required />
+    <label>Email</label>
+    <input type="email" [(ngModel)]="email" name="email" required />
+    <label>Password</label>
+    <input type="password" [(ngModel)]="password" name="password" required minlength="6" />
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <button type="submit" [disabled]="loading">{{ loading ? 'Creating...' : 'Create account' }}</button>
+    <p class="switch">Already have an account? <a routerLink="/login">Sign in</a></p>
+  </form>
+
+  <div class="auth-card success" *ngIf="submitted">
+    <h2>Account created</h2>
+    <p>{{ successMessage }}</p>
+    <p class="switch">Once an admin approves your account, you can <a routerLink="/login">sign in</a>.</p>
+  </div>
+</div>

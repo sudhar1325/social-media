@@ -1,0 +1,15 @@
+<nav class="navbar">
+  <a routerLink="/feed" class="brand">Commons</a>
+  <div class="links" *ngIf="auth.isLoggedIn()">
+    <a routerLink="/feed" routerLinkActive="active">Feed</a>
+    <a routerLink="/upload" routerLinkActive="active">Post</a>
+    <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    <a routerLink="/admin" routerLinkActive="active" *ngIf="auth.isAdmin()">Admin</a>
+    <span class="user">{{ auth.currentUser()?.username }}</span>
+    <button (click)="auth.logout()">Logout</button>
+  </div>
+  <div class="links" *ngIf="!auth.isLoggedIn()">
+    <a routerLink="/login" routerLinkActive="active">Login</a>
+    <a routerLink="/register" routerLinkActive="active">Register</a>
+  </div>
+</nav>

@@ -1,0 +1,71 @@
+<div class="wrap">
+  <h2>Admin dashboard</h2>
+
+  <div class="stats" *ngIf="stats">
+    <div class="stat"><span>{{ stats.pendingUsers }}</span>Pending users</div>
+    <div class="stat"><span>{{ stats.pendingPosts }}</span>Pending posts</div>
+    <div class="stat"><span>{{ stats.totalUsers }}</span>Users</div>
+    <div class="stat"><span>{{ stats.totalPosts }}</span>Total posts</div>
+    <div class="stat"><span>{{ stats.openReports }}</span>Open reports</div>
+  </div>
+
+  <div class="tabs">
+    <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
+      Pending users <span class="badge" *ngIf="pendingUsers.length">{{ pendingUsers.length }}</span>
+    </button>
+    <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">Pending posts</button>
+    <button [class.active]="tab === 'users'" (click)="tab = 'users'">All users</button>
+  </div>
+
+  <div *ngIf="tab === 'pendingUsers'">
+    <div class="card" *ngFor="let u of pendingUsers">
+      <div class="card-head">
+        <span>{{ u.username }}</span>
+        <span>{{ u.createdAt | date: 'medium' }}</span>
+      </div>
+      <p class="email">{{ u.email }}</p>
+      <div class="actions">
+        <button class="approve" (click)="approveUser(u)">Approve account</button>
+      </div>
+    </div>
+    <p class="empty" *ngIf="pendingUsers.length === 0">No accounts awaiting approval.</p>
+  </div>
+
+  <div *ngIf="tab === 'pending'">
+    <div class="card" *ngFor="let post of pending">
+      <div class="card-head">
+        <span>{{ authorName(post) }}</span>
+        <span>{{ post.createdAt | date: 'medium' }}</span>
+      </div>
+      <p *ngIf="post.description">{{ post.description }}</p>
+      <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
+      <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+      <div class="actions">
+        <button class="approve" (click)="approve(post)">Approve</button>
+        <button class="reject" (click)="reject(post)">Reject</button>
+      </div>
+    </div>
+    <p class="empty" *ngIf="pending.length === 0">No posts awaiting review.</p>
+  </div>
+
+  <div *ngIf="tab === 'users'">
+    <table>
+      <thead>
+        <tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ u.accountStatus }}</td>
+          <td>
+            <button *ngIf="u.accountStatus === 'pending'" (click)="approveUser(u)">Approve</button>
+            <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">Suspend</button>
+            <button *ngIf="u.accountStatus === 'suspended'" (click)="activate(u)">Activate</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+.wrap {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+h2 {
+  margin: 0 0 0.3rem;
+  color: #14213d;
+}
+
+textarea,
+.category {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+  resize: vertical;
+}
+
+.file-label {
+  border: 1px dashed #aaa;
+  border-radius: 6px;
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.error {
+  color: #c0392b;
+  font-size: 0.85rem;
+}
+
+button {
+  background: #fca311;
+  color: #14213d;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -1,0 +1,17 @@
+<div class="wrap">
+  <div class="card">
+    <h2>Create a post</h2>
+    <textarea [(ngModel)]="description" rows="4" placeholder="What's on your mind?"></textarea>
+
+    <label class="file-label">
+      {{ fileName || 'Attach an image or video (optional)' }}
+      <input type="file" accept="image/*,video/*" (change)="onFile($event)" hidden />
+    </label>
+
+    <input class="category" [(ngModel)]="category" placeholder="Category (e.g. general)" />
+
+    <p class="hint">Your post will be reviewed by an admin before it appears in the feed.</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <button (click)="submit()" [disabled]="loading">{{ loading ? 'Posting...' : 'Submit for review' }}</button>
+  </div>
+</div>

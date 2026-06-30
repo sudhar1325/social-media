@@ -1,0 +1,34 @@
+<div class="feed">
+  <h2>Community feed</h2>
+  <p class="empty" *ngIf="!loading && posts.length === 0">
+    Nothing here yet. Be the first to post.
+  </p>
+
+  <div class="card" *ngFor="let post of posts">
+    <div class="card-head">
+      <span class="username">{{ authorName(post) }}</span>
+      <span class="date">{{ post.createdAt | date: 'medium' }}</span>
+    </div>
+    <p class="desc" *ngIf="post.description">{{ post.description }}</p>
+    <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
+    <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+
+    <div class="actions">
+      <button (click)="toggleLike(post)">▲ {{ post.likeCount }}</button>
+      <button (click)="toggleComments(post)">💬 {{ post.commentCount }}</button>
+      <button (click)="report(post)">Report</button>
+    </div>
+
+    <div class="comments" *ngIf="openComments[post._id]">
+      <div class="comment" *ngFor="let c of comments[post._id]">
+        <strong>{{ authorName(c) }}:</strong> {{ c.comment }}
+      </div>
+      <div class="add-comment">
+        <input [(ngModel)]="newComment[post._id]" placeholder="Write a comment..." />
+        <button (click)="submitComment(post)">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="load-more" *ngIf="page < totalPages" (click)="loadMore()">Load more</button>
+</div>

@@ -16,7 +16,8 @@ export class AdminComponent implements OnInit {
   pending: Post[] = [];
   pendingUsers: User[] = [];
   users: User[] = [];
-  tab: 'pendingUsers' | 'pending' | 'users' = 'pendingUsers';
+  reports: any[] = [];
+  tab: 'pendingUsers' | 'pending' | 'reports' | 'users' = 'pendingUsers';
   fileBase = environment.fileBaseUrl;
 
   constructor(private adminService: AdminService) {}
@@ -26,6 +27,7 @@ export class AdminComponent implements OnInit {
     this.loadPendingUsers();
     this.loadPending();
     this.loadUsers();
+    this.loadReports();
   }
 
   refreshStats() {
@@ -33,11 +35,15 @@ export class AdminComponent implements OnInit {
   }
 
   loadPendingUsers() {
-    this.adminService.getPendingUsers().subscribe((res) => (this.pendingUsers = res.users));
+    this.adminService
+      .getPendingUsers()
+      .subscribe((res) => (this.pendingUsers = res.users));
   }
 
   loadPending() {
-    this.adminService.getPendingPosts().subscribe((res) => (this.pending = res.posts));
+    this.adminService
+      .getPendingPosts()
+      .subscribe((res) => (this.pending = res.posts));
   }
 
   loadUsers() {
@@ -57,7 +63,8 @@ export class AdminComponent implements OnInit {
   }
 
   reject(post: Post) {
-    const reason = prompt('Reason for rejection?') || 'Did not meet community guidelines';
+    const reason =
+      prompt('Reason for rejection?') || 'Did not meet community guidelines';
     this.adminService.rejectPost(post._id, reason).subscribe(() => {
       this.pending = this.pending.filter((p) => p._id !== post._id);
       this.refreshStats();
@@ -82,6 +89,42 @@ export class AdminComponent implements OnInit {
   activate(u: User) {
     this.adminService.setUserStatus(u._id, 'active').subscribe((res) => {
       u.accountStatus = res.user.accountStatus;
+    });
+  }
+
+  loadReports() {
+    this.adminService.getReports().subscribe((res) => {
+      this.reports = res.reports;
+    });
+  }
+
+  resolveReport(report: any) {
+    this.adminService.resolveReport(report._id, 'resolved').subscribe({
+      next: (res) => {
+        console.log(res);
+
+        this.loadReports();
+        this.refreshStats();
+      },
+
+      error: (err) => {
+        console.log(err);
+      },
+    });
+  }
+
+  dismissReport(report: any) {
+    this.adminService.resolveReport(report._id, 'dismissed').subscribe({
+      next: (res) => {
+        console.log(res);
+
+        this.loadReports();
+        this.refreshStats();
+      },
+
+      error: (err) => {
+        console.log(err);
+      },
     });
   }
 }

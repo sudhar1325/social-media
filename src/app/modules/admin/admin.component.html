@@ -2,44 +2,84 @@
   <h2>Admin dashboard</h2>
 
   <div class="stats" *ngIf="stats">
-    <div class="stat"><span>{{ stats.pendingUsers }}</span>Pending users</div>
-    <div class="stat"><span>{{ stats.pendingPosts }}</span>Pending posts</div>
-    <div class="stat"><span>{{ stats.totalUsers }}</span>Users</div>
-    <div class="stat"><span>{{ stats.totalPosts }}</span>Total posts</div>
-    <div class="stat"><span>{{ stats.openReports }}</span>Open reports</div>
+    <div class="stat">
+      <span>{{ stats.pendingUsers }}</span
+      >Pending users
+    </div>
+    <div class="stat">
+      <span>{{ stats.pendingPosts }}</span
+      >Pending posts
+    </div>
+    <div class="stat">
+      <span>{{ stats.totalUsers }}</span
+      >Users
+    </div>
+    <div class="stat">
+      <span>{{ stats.totalPosts }}</span
+      >Total posts
+    </div>
+    <div class="stat">
+      <span>{{ stats.openReports }}</span
+      >reports
+    </div>
   </div>
 
   <div class="tabs">
-    <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
-      Pending users <span class="badge" *ngIf="pendingUsers.length">{{ pendingUsers.length }}</span>
+    <button
+      [class.active]="tab === 'pendingUsers'"
+      (click)="tab = 'pendingUsers'"
+    >
+      Pending users
+      <span class="badge" *ngIf="pendingUsers.length">{{
+        pendingUsers.length
+      }}</span>
     </button>
-    <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">Pending posts</button>
-    <button [class.active]="tab === 'users'" (click)="tab = 'users'">All users</button>
+    <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">
+      Pending posts
+    </button>
+    <button [class.active]="tab === 'reports'" (click)="tab = 'reports'">
+      Reports
+      <span class="badge" *ngIf="reports.length">{{ reports.length }}</span>
+    </button>
+    <button [class.active]="tab === 'users'" (click)="tab = 'users'">
+      All users
+    </button>
   </div>
 
   <div *ngIf="tab === 'pendingUsers'">
     <div class="card" *ngFor="let u of pendingUsers">
       <div class="card-head">
         <span>{{ u.username }}</span>
-        <span>{{ u.createdAt | date: 'medium' }}</span>
+        <span>{{ u.createdAt | date: "medium" }}</span>
       </div>
       <p class="email">{{ u.email }}</p>
       <div class="actions">
-        <button class="approve" (click)="approveUser(u)">Approve account</button>
+        <button class="approve" (click)="approveUser(u)">
+          Approve account
+        </button>
       </div>
     </div>
-    <p class="empty" *ngIf="pendingUsers.length === 0">No accounts awaiting approval.</p>
+    <p class="empty" *ngIf="pendingUsers.length === 0">
+      No accounts awaiting approval.
+    </p>
   </div>
 
   <div *ngIf="tab === 'pending'">
     <div class="card" *ngFor="let post of pending">
       <div class="card-head">
         <span>{{ authorName(post) }}</span>
-        <span>{{ post.createdAt | date: 'medium' }}</span>
+        <span>{{ post.createdAt | date: "medium" }}</span>
       </div>
       <p *ngIf="post.description">{{ post.description }}</p>
-      <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
-      <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+      <img
+        *ngIf="post.mediaType === 'image'"
+        [src]="fileBase + post.mediaURL"
+      />
+      <video
+        *ngIf="post.mediaType === 'video'"
+        [src]="fileBase + post.mediaURL"
+        controls
+      ></video>
       <div class="actions">
         <button class="approve" (click)="approve(post)">Approve</button>
         <button class="reject" (click)="reject(post)">Reject</button>
@@ -47,11 +87,62 @@
     </div>
     <p class="empty" *ngIf="pending.length === 0">No posts awaiting review.</p>
   </div>
+  <div *ngIf="tab === 'reports'">
+    <div class="card" *ngFor="let report of reports">
+      <div class="card-head">
+        <span>
+          Reported by:
+          {{ report.reportedBy?.username }}
+        </span>
+
+        <span>
+          {{ report.createdAt | date: "medium" }}
+        </span>
+      </div>
+
+      <h4>Issue</h4>
+
+      <p>
+        {{ report.reason }}
+      </p>
+
+      <h4>Reported post</h4>
+
+      <p *ngIf="report.postId?.description">
+        {{ report.postId.description }}
+      </p>
+
+      <img
+        *ngIf="report.postId?.mediaType === 'image'"
+        [src]="fileBase + report.postId.mediaURL"
+      />
+
+      <video
+        *ngIf="report.postId?.mediaType === 'video'"
+        [src]="fileBase + report.postId.mediaURL"
+        controls
+      ></video>
+
+      <div class="actions">
+        <button class="approve" (click)="resolveReport(report)">Resolve</button>
+
+        <button class="reject" (click)="dismissReport(report)">Dismiss</button>
+      </div>
+    </div>
+
+    <p class="empty" *ngIf="reports.length === 0">No open reports.</p>
+  </div>
 
   <div *ngIf="tab === 'users'">
     <table>
       <thead>
-        <tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
       </thead>
       <tbody>
         <tr *ngFor="let u of users">
@@ -60,9 +151,21 @@
           <td>{{ u.role }}</td>
           <td>{{ u.accountStatus }}</td>
           <td>
-            <button *ngIf="u.accountStatus === 'pending'" (click)="approveUser(u)">Approve</button>
-            <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">Suspend</button>
-            <button *ngIf="u.accountStatus === 'suspended'" (click)="activate(u)">Activate</button>
+            <button
+              *ngIf="u.accountStatus === 'pending'"
+              (click)="approveUser(u)"
+            >
+              Approve
+            </button>
+            <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">
+              Suspend
+            </button>
+            <button
+              *ngIf="u.accountStatus === 'suspended'"
+              (click)="activate(u)"
+            >
+              Activate
+            </button>
           </td>
         </tr>
       </tbody>

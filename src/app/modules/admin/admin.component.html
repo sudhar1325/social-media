@@ -3,47 +3,75 @@
 
   <div class="stats" *ngIf="stats">
     <div class="stat">
-      <span>{{ stats.pendingUsers }}</span
-      >Pending users
+      <span>{{ stats.pendingUsers }}</span>Pending users
     </div>
     <div class="stat">
-      <span>{{ stats.pendingPosts }}</span
-      >Pending posts
+      <span>{{ stats.pendingPosts }}</span>Pending posts
     </div>
     <div class="stat">
-      <span>{{ stats.totalUsers }}</span
-      >Users
+      <span>{{ stats.totalUsers }}</span>Users
     </div>
     <div class="stat">
-      <span>{{ stats.totalPosts }}</span
-      >Total posts
+      <span>{{ stats.totalPosts }}</span>Total posts
     </div>
     <div class="stat">
-      <span>{{ stats.openReports }}</span
-      >reports
+      <span>{{ stats.openReports }}</span>reports
     </div>
   </div>
 
   <div class="tabs">
-    <button
-      [class.active]="tab === 'pendingUsers'"
-      (click)="tab = 'pendingUsers'"
-    >
-      Pending users
-      <span class="badge" *ngIf="pendingUsers.length">{{
-        pendingUsers.length
-      }}</span>
-    </button>
-    <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">
-      Pending posts
-    </button>
-    <button [class.active]="tab === 'reports'" (click)="tab = 'reports'">
-      Reports
-      <span class="badge" *ngIf="reports.length">{{ reports.length }}</span>
-    </button>
     <button [class.active]="tab === 'users'" (click)="tab = 'users'">
-      All users
+      All users <span class="badge" *ngIf="pendingUsers.length">{{ users.length }}</span>
     </button>
+    <!-- <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
+      Pending users -->
+      <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
+        Pending users
+        <span class="badge" *ngIf="pendingUsers.length">{{
+          pendingUsers.length
+          }}</span>
+      </button>
+      <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">
+        Pending posts
+      </button>
+      <button [class.active]="tab === 'reports'" (click)="tab = 'reports'">
+        Reports
+        <span class="badge" *ngIf="reports.length">{{ reports.length }}</span>
+      </button>
+      
+  </div>
+
+  <div *ngIf="tab === 'users'">
+    <div class="table-header">
+      <button class="btn-add"  (click)="openAddModal()">Add user</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ u.accountStatus }}</td>
+          <td class="action-buttons">
+            <button class="btn-edit" (click)="editUser(u)">Edit</button>
+            <button *ngIf="u.accountStatus === 'pending'" class="btn-approve" (click)="approveUser(u)">Approve</button>
+            <button *ngIf="u.accountStatus === 'active'" class="btn-suspend" (click)="suspend(u)">Suspend</button>
+            <button *ngIf="u.accountStatus === 'suspended'" class="btn-activate" (click)="activate(u)">Activate</button>
+            <button class="btn-delete" (click)="deleteUser(u)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div *ngIf="tab === 'pendingUsers'">
@@ -71,15 +99,8 @@
         <span>{{ post.createdAt | date: "medium" }}</span>
       </div>
       <p *ngIf="post.description">{{ post.description }}</p>
-      <img
-        *ngIf="post.mediaType === 'image'"
-        [src]="fileBase + post.mediaURL"
-      />
-      <video
-        *ngIf="post.mediaType === 'video'"
-        [src]="fileBase + post.mediaURL"
-        controls
-      ></video>
+      <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
+      <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
       <div class="actions">
         <button class="approve" (click)="approve(post)">Approve</button>
         <button class="reject" (click)="reject(post)">Reject</button>
@@ -87,88 +108,153 @@
     </div>
     <p class="empty" *ngIf="pending.length === 0">No posts awaiting review.</p>
   </div>
-  <div *ngIf="tab === 'reports'">
-    <div class="card" *ngFor="let report of reports">
-      <div class="card-head">
-        <span>
-          Reported by:
-          {{ report.reportedBy?.username }}
-        </span>
+</div>
 
-        <span>
-          {{ report.createdAt | date: "medium" }}
-        </span>
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Edit user</h3>
+
+    <label>
+      Username
+      <input type="text" [(ngModel)]="editForm.username" name="username" />
+    </label>
+
+    <label>
+      Email
+      <input type="email" [(ngModel)]="editForm.email" name="email" />
+    </label>
+
+    <label>
+      Role
+      <select [(ngModel)]="editForm.role" name="role">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select [(ngModel)]="editForm.accountStatus" name="accountStatus">
+        <option value="pending">pending</option>
+        <option value="active">active</option>
+        <option value="suspended">suspended</option>
+      </select>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeEditModal()" [disabled]="saving">Cancel</button>
+      <button class="btn-save" (click)="saveEdit()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save changes' }}
+      </button>
+    </div>
+    </div>
+</div>
+<div class="wrap">
+    <div *ngIf="tab === 'reports'">
+      <div class="card" *ngFor="let report of reports">
+        <div class="card-head">
+          <span>
+            Reported by:
+            {{ report.reportedBy?.username }}
+          </span>
+
+          <span>
+            {{ report.createdAt | date: "medium" }}
+          </span>
+        </div>
+
+        <h4>Issue</h4>
+
+        <p>
+          {{ report.reason }}
+        </p>
+
+        <h4>Reported post</h4>
+
+        <p *ngIf="report.postId?.description">
+          {{ report.postId.description }}
+        </p>
+
+        <img *ngIf="report.postId?.mediaType === 'image'" [src]="fileBase + report.postId.mediaURL" />
+
+        <video *ngIf="report.postId?.mediaType === 'video'" [src]="fileBase + report.postId.mediaURL" controls></video>
+
+        <div class="actions">
+          <button class="approve" (click)="resolveReport(report)">Resolve</button>
+
+          <button class="reject" (click)="dismissReport(report)">Dismiss</button>
+        </div>
       </div>
 
-      <h4>Issue</h4>
-
-      <p>
-        {{ report.reason }}
-      </p>
-
-      <h4>Reported post</h4>
-
-      <p *ngIf="report.postId?.description">
-        {{ report.postId.description }}
-      </p>
-
-      <img
-        *ngIf="report.postId?.mediaType === 'image'"
-        [src]="fileBase + report.postId.mediaURL"
-      />
-
-      <video
-        *ngIf="report.postId?.mediaType === 'video'"
-        [src]="fileBase + report.postId.mediaURL"
-        controls
-      ></video>
-
-      <div class="actions">
-        <button class="approve" (click)="resolveReport(report)">Resolve</button>
-
-        <button class="reject" (click)="dismissReport(report)">Dismiss</button>
-      </div>
+      <p class="empty" *ngIf="reports.length === 0">No open reports.</p>
+    </div>
     </div>
 
-    <p class="empty" *ngIf="reports.length === 0">No open reports.</p>
-  </div>
+    <div *ngIf="tab === 'users'">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.role }}</td>
+            <td>{{ u.accountStatus }}</td>
+            <td>
+              <button *ngIf="u.accountStatus === 'pending'" (click)="approveUser(u)">
+                Approve
+              </button>
+              <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">
+                Suspend
+              </button>
+              <button *ngIf="u.accountStatus === 'suspended'" (click)="activate(u)">
+                Activate
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Add user</h3>
 
-  <div *ngIf="tab === 'users'">
-    <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let u of users">
-          <td>{{ u.username }}</td>
-          <td>{{ u.email }}</td>
-          <td>{{ u.role }}</td>
-          <td>{{ u.accountStatus }}</td>
-          <td>
-            <button
-              *ngIf="u.accountStatus === 'pending'"
-              (click)="approveUser(u)"
-            >
-              Approve
-            </button>
-            <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">
-              Suspend
-            </button>
-            <button
-              *ngIf="u.accountStatus === 'suspended'"
-              (click)="activate(u)"
-            >
-              Activate
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <label>
+        Username
+        <input type="text" [(ngModel)]="addForm.username" name="addUsername" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" [(ngModel)]="addForm.email" name="addEmail" />
+      </label>
+
+      <label>
+        Password
+        <input type="password" [(ngModel)]="addForm.password" name="addPassword" />
+      </label>
+
+      <label>
+        Role
+        <select [(ngModel)]="addForm.role" name="addRole">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeAddModal()" [disabled]="adding">Cancel</button>
+        <button class="btn-save" (click)="saveAddUser()" [disabled]="adding">
+          {{ adding ? 'Creating...' : 'Create user' }}
+        </button>
+      </div>
+    </div>
   </div>
-</div>

@@ -76,4 +76,18 @@ export class AdminService {
       status,
     });
   }
+  // admin.service.ts — fix these two methods
+
+updateUser(id: string, data: Partial<User>) {
+  return this.http.patch<{ success: boolean; user: User }>(`${this.base}/users/${id}`, data);
+}
+
+deleteUser(id: string) {
+  return this.http.delete<{ success: boolean; message: string }>(`${this.base}/users/${id}`);
+}
+
+createUser(data: { username: string; email: string; password: string; role: 'user' | 'admin' }) {
+  return this.http.post<{ success: boolean; user: User }>(`${this.base}/users`, data);
+}
+  
 }

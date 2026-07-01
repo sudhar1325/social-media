@@ -1,25 +1,106 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PostService } from '../../core/services/post.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Post } from '../../core/models/models';
+import { UserService } from '../../core/services/user.service';
+import { Post, User } from '../../core/models/models';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
+  user: User | null = null;
   posts: Post[] = [];
+  loadError = '';
   fileBase = environment.fileBaseUrl;
 
-  constructor(private postService: PostService, public auth: AuthService) {}
+  // Edit modal state
+  editOpen = false;
+  editBio = '';
+  avatarFile: File | null = null;
+  avatarPreview: string | null = null;
+  saving = false;
+  saveError = '';
+
+  constructor(private postService: PostService, private userService: UserService) {}
 
   ngOnInit() {
+    this.loadProfile();
     this.postService.getMyPosts().subscribe((res) => (this.posts = res.posts));
+  }
+
+  loadProfile() {
+    this.userService.getProfile().subscribe({
+      next: (res) => (this.user = res.user),
+      error: (err) => {
+        console.error('Failed to load profile:', err);
+        this.loadError = err.error?.message || 'Could not load profile details';
+      },
+    });
+  }
+
+  avatarUrl(path?: string): string {
+    if (!path) return '';
+    return path.startsWith('http') ? path : `${this.fileBase}${path}`;
+  }
+
+  openEdit() {
+    if (!this.user) return;
+    this.editBio = this.user.bio || '';
+    this.avatarFile = null;
+    this.avatarPreview = null;
+    this.saveError = '';
+    this.editOpen = true;
+  }
+
+  closeEdit() {
+    this.editOpen = false;
+  }
+
+  onAvatarSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.avatarFile = input.files[0];
+      this.avatarPreview = URL.createObjectURL(this.avatarFile);
+    }
+  }
+
+  saveEdit() {
+    this.saving = true;
+    this.saveError = '';
+
+    // Save bio first, then avatar if one was picked, so either can succeed
+    // independently and we always end with the freshest user object.
+    this.userService.updateProfile({ bio: this.editBio }).subscribe({
+      next: (res) => {
+        this.user = res.user;
+        if (this.avatarFile) {
+          this.userService.uploadAvatar(this.avatarFile).subscribe({
+            next: (avatarRes) => {
+              this.user = avatarRes.user;
+              this.saving = false;
+              this.editOpen = false;
+            },
+            error: (err) => {
+              this.saving = false;
+              this.saveError = err.error?.message || 'Failed to upload image';
+            },
+          });
+        } else {
+          this.saving = false;
+          this.editOpen = false;
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        this.saveError = err.error?.message || 'Failed to update profile';
+      },
+    });
   }
 
   remove(post: Post) {

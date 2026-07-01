@@ -5,6 +5,7 @@
   </p>
 
   <div class="card" *ngFor="let post of posts">
+    <!-- <Link>{{ authorName(post) }}</Link> -->
     <div class="card-head">
       <span class="username">{{ authorName(post) }}</span>
       <span class="date">{{ post.createdAt | date: 'medium' }}</span>

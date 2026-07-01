@@ -6,6 +6,9 @@ export interface User {
   profileImage?: string;
   bio?: string;
   accountStatus: 'pending' | 'active' | 'suspended';
+  followersCount?: number;
+  followingCount?: number;
+  postsCount?: number;
   createdAt?: string;
 }
 

@@ -4,8 +4,110 @@
   padding: 0 1rem;
 }
 
-h2 {
+.error {
+  color: #c0392b;
+  font-size: 0.85rem;
+}
+
+.profile-header {
+  display: flex;
+  gap: 1.2rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.4rem;
+  margin-bottom: 1.6rem;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #14213d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.info h2 {
+  margin: 0;
   color: #14213d;
+}
+
+.edit-btn {
+  background: #f3f4f6;
+  border: none;
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #14213d;
+  flex-shrink: 0;
+}
+
+.info .email {
+  margin: 0.15rem 0 0.5rem;
+  color: #666;
+  font-size: 0.88rem;
+}
+
+.info .bio {
+  margin: 0 0 0.8rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.info .bio.empty-bio {
+  color: #999;
+  font-style: italic;
+}
+
+.counts {
+  display: flex;
+  gap: 1.6rem;
+}
+
+.count {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.78rem;
+  color: #666;
+}
+
+.count span {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #14213d;
+}
+
+.section-title {
+  color: #14213d;
+  font-size: 1rem;
+  margin: 0 0 0.8rem;
 }
 
 .card {
@@ -70,4 +172,114 @@ video {
   color: #777;
   text-align: center;
   margin-top: 2rem;
+}
+
+// Modal
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal-card h3 {
+  margin: 0 0 0.4rem;
+  color: #14213d;
+}
+
+.modal-card label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.4rem;
+}
+
+.modal-card input,
+.modal-card textarea {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.modal-actions .cancel {
+  background: #f3f4f6;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions .save {
+  background: #14213d;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-actions .save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.avatar-picker {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.avatar-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #14213d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-label {
+  background: #f3f4f6;
+  border: 1px dashed #aaa;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
 }

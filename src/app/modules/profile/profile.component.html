@@ -1,5 +1,38 @@
 <div class="wrap">
-  <h2>{{ auth.currentUser()?.username }}'s posts</h2>
+  <p class="error" *ngIf="loadError">{{ loadError }}</p>
+
+  <div class="profile-header" *ngIf="user">
+    <div class="avatar">
+      <img *ngIf="user.profileImage" [src]="avatarUrl(user.profileImage)" />
+      <span *ngIf="!user.profileImage">{{ user.username.charAt(0).toUpperCase() }}</span>
+    </div>
+    <div class="info">
+      <div class="info-top">
+        <h2>{{ user.username }}</h2>
+        <button class="edit-btn" (click)="openEdit()">Edit profile</button>
+      </div>
+      <p class="email">{{ user.email }}</p>
+      <p class="bio" *ngIf="user.bio">{{ user.bio }}</p>
+      <p class="bio empty-bio" *ngIf="!user.bio">No bio yet.</p>
+
+      <div class="counts">
+        <div class="count">
+          <span>{{ posts.length }}</span>
+          Posts
+        </div>
+        <div class="count">
+          <span>{{ user.followersCount || 0 }}</span>
+          Followers
+        </div>
+        <div class="count">
+          <span>{{ user.followingCount || 0 }}</span>
+          Following
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-title">Your posts</h3>
   <div class="card" *ngFor="let post of posts">
     <div class="card-head">
       <span class="status" [ngClass]="post.status">{{ post.status }}</span>
@@ -14,4 +47,38 @@
     <button class="delete" (click)="remove(post)">Delete</button>
   </div>
   <p class="empty" *ngIf="posts.length === 0">You haven't posted anything yet.</p>
+</div>
+
+<!-- Edit profile modal -->
+<div class="modal-backdrop" *ngIf="editOpen" (click)="closeEdit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Edit profile</h3>
+
+    <label>Profile image</label>
+    <div class="avatar-picker">
+      <div class="avatar-preview">
+        <img *ngIf="avatarPreview" [src]="avatarPreview" />
+        <img *ngIf="!avatarPreview && user?.profileImage" [src]="avatarUrl(user!.profileImage)" />
+        <span *ngIf="!avatarPreview && !user?.profileImage">
+          {{ user?.username?.charAt(0)?.toUpperCase() }}
+        </span>
+      </div>
+      <label class="file-label">
+        Choose image
+        <input type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
+      </label>
+    </div>
+
+    <label>Bio</label>
+    <textarea [(ngModel)]="editBio" rows="4" placeholder="Tell people about yourself..."></textarea>
+
+    <p class="error" *ngIf="saveError">{{ saveError }}</p>
+
+    <div class="modal-actions">
+      <button class="cancel" (click)="closeEdit()">Cancel</button>
+      <button class="save" (click)="saveEdit()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save changes' }}
+      </button>
+    </div>
+  </div>
 </div>

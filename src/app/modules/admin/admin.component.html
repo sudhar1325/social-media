@@ -14,7 +14,7 @@
       All users <span class="badge" *ngIf="pendingUsers.length">{{ users.length }}</span>
     </button>
     <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
-      Pending users
+      Pending users<span class="badge" *ngIf="pendingUsers.length">{{ pendingUsers.length }}</span>
     </button>
     <button [class.active]="tab === 'pending'" (click)="tab = 'pending'">Pending posts</button>
   </div>

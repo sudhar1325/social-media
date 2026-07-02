@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { User } from '../models/models';
+import { User, Post } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -21,5 +21,11 @@ export class UserService {
     const formData = new FormData();
     formData.append('avatar', file);
     return this.http.put<{ success: boolean; user: User }>(`${this.base}/avatar`, formData);
+  }
+
+  getUserProfile(id: string) {
+    return this.http.get<{ success: boolean; user: User; posts: Post[] }>(
+      `${environment.apiUrl}/users/${id}`
+    );
   }
 }

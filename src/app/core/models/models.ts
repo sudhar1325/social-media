@@ -1,3 +1,8 @@
+export interface MediaFile {
+  url: string;
+  type: 'image' | 'video';
+}
+
 export interface User {
   _id: string;
   username: string;
@@ -16,8 +21,9 @@ export interface Post {
   _id: string;
   userId: User | string;
   description: string;
-  mediaType: 'image' | 'video' | 'text';
+  mediaType: 'image' | 'video' | 'mixed' | 'text';
   mediaURL: string;
+  mediaFiles: MediaFile[];
   category: string;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;

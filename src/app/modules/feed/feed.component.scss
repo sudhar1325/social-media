@@ -299,6 +299,29 @@ h2 {
   font-size: 0.9rem;
 }
 
+.search-box {
+  margin-bottom: 1rem;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.filter-form select,
+.filter-form button {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.filter-form button {
+  background: #14213d;
+  color: white;
+  cursor: pointer;
+}
 .load-more:hover {
   background: #f3f4f6;
 }

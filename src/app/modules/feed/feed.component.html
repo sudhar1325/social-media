@@ -1,9 +1,11 @@
 <div class="feed">
   <h2>Community feed</h2>
+  <!-- SEARCH -->
+  <div class="search-box">
+    <input type="text" placeholder="Search content..." [(ngModel)]="searchText" (input)="searchLive()" />
+  </div>
 
-  <p class="empty" *ngIf="!loading && posts.length === 0">
-    Nothing here yet. Be the first to post.
-  </p>
+  <p class="empty" *ngIf="!loading && filteredPosts.length === 0">
 
   <div class="post-card" *ngFor="let post of posts">
 

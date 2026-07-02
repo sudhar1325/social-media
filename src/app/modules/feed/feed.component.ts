@@ -19,14 +19,19 @@ export class FeedComponent implements OnInit {
   totalPages = 1;
   loading = false;
   fileBase = environment.fileBaseUrl;
-
+  searchText = '';
+  filteredPosts: Post[] = [];
+  filters = {
+    mediaType: '',
+    category: '',
+  };
   slideIndex: Record<string, number> = {};
   openComments: Record<string, boolean> = {};
   comments: Record<string, any[]> = {};
   newComment: Record<string, string> = {};
   likedPosts = new Set<string>();
 
-  constructor(private postService: PostService) {}
+  constructor(private postService: PostService) { }
 
   ngOnInit() {
     this.fetch();
@@ -38,10 +43,13 @@ export class FeedComponent implements OnInit {
       next: (res) => {
         res.posts.forEach((p) => (this.slideIndex[p._id] = 0));
         this.posts = [...this.posts, ...res.posts];
+        this.filteredPosts = this.posts;
         this.totalPages = res.totalPages;
         this.loading = false;
       },
-      error: () => (this.loading = false),
+      error: () => {
+        this.loading = false;
+      },
     });
   }
 
@@ -122,7 +130,10 @@ export class FeedComponent implements OnInit {
     const text = this.newComment[post._id];
     if (!text) return;
     this.postService.addComment(post._id, text).subscribe((res) => {
-      this.comments[post._id] = [...(this.comments[post._id] || []), res.comment];
+      this.comments[post._id] = [
+        ...(this.comments[post._id] || []),
+        res.comment,
+      ];
       post.commentCount++;
       this.newComment[post._id] = '';
     });
@@ -132,5 +143,29 @@ export class FeedComponent implements OnInit {
     const reason = prompt('Why are you reporting this post?');
     if (!reason) return;
     this.postService.reportPost(post._id, reason).subscribe(() => alert('Report submitted'));
+  }
+
+  searchLive() {
+    const value = this.searchText.toLowerCase().trim();
+    if (!value) {
+      this.filteredPosts = this.posts;
+      return;
+    }
+    this.filteredPosts = this.posts.filter((post) => {
+      // username search
+      const username =
+        typeof post.userId === 'object'
+          ? post.userId.username?.toLowerCase() || ''
+          : '';
+      // description search
+      const description = post.description?.toLowerCase() || '';
+      // category search
+      const category = post.category?.toLowerCase() || '';
+      return (
+        username.includes(value) ||
+        description.includes(value) ||
+        category.includes(value)
+      );
+    });
   }
 }

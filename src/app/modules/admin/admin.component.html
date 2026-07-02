@@ -190,38 +190,6 @@
     </div>
     </div>
 
-    <div *ngIf="tab === 'users'">
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of users">
-            <td>{{ u.username }}</td>
-            <td>{{ u.email }}</td>
-            <td>{{ u.role }}</td>
-            <td>{{ u.accountStatus }}</td>
-            <td>
-              <button *ngIf="u.accountStatus === 'pending'" (click)="approveUser(u)">
-                Approve
-              </button>
-              <button *ngIf="u.accountStatus === 'active'" (click)="suspend(u)">
-                Suspend
-              </button>
-              <button *ngIf="u.accountStatus === 'suspended'" (click)="activate(u)">
-                Activate
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   
   <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
     <div class="modal" (click)="$event.stopPropagation()">

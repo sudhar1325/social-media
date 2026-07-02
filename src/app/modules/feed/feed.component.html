@@ -1,14 +1,17 @@
 <div class="feed">
   <h2>Community feed</h2>
-  <p class="empty" *ngIf="!loading && posts.length === 0">
-    Nothing here yet. Be the first to post.
-  </p>
+  <!-- SEARCH -->
+  <div class="search-box">
+    <input type="text" placeholder="Search content..." [(ngModel)]="searchText" (input)="searchLive()" />
+  </div>
 
-  <div class="card" *ngFor="let post of posts">
+  <p class="empty" *ngIf="!loading && filteredPosts.length === 0">
+
+  <div class="card" *ngFor="let post of filteredPosts">
     <!-- <Link>{{ authorName(post) }}</Link> -->
     <div class="card-head">
       <span class="username">{{ authorName(post) }}</span>
-      <span class="date">{{ post.createdAt | date: 'medium' }}</span>
+      <span class="date">{{ post.createdAt | date: "medium" }}</span>
     </div>
     <p class="desc" *ngIf="post.description">{{ post.description }}</p>
     <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
@@ -31,5 +34,7 @@
     </div>
   </div>
 
-  <button class="load-more" *ngIf="page < totalPages" (click)="loadMore()">Load more</button>
+  <button class="load-more" *ngIf="page < totalPages" (click)="loadMore()">
+    Load more
+  </button>
 </div>

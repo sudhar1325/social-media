@@ -18,8 +18,12 @@ export class AdminComponent implements OnInit {
   pendingUsers: User[] = [];
   users: User[] = [];
   reports: any[] = [];
-  tab: 'pendingUsers' | 'pending' | 'reports' | 'users' = 'users';
+  tab: 'pendingUsers' | 'pending' | 'reports'|'pendingPosts' | 'users' = 'users';
   fileBase = environment.fileBaseUrl;
+
+  // Search terms
+  userSearch: string = '';
+  pendingUserSearch: string = '';
 
   showEditModal = false;
   editForm: {
@@ -37,6 +41,15 @@ export class AdminComponent implements OnInit {
   };
   saving = false;
 
+  showAddModal = false;
+  addForm: { username: string; email: string; password: string; role: 'user' | 'admin' } = {
+    username: '',
+    email: '',
+    password: '',
+    role: 'user',
+  };
+  adding = false;
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit() {
@@ -45,6 +58,29 @@ export class AdminComponent implements OnInit {
     this.loadPending();
     this.loadUsers();
     this.loadReports();
+  }
+
+  // ----- Filtered getters for search -----
+  get filteredUsers(): User[] {
+    const term = this.userSearch.trim().toLowerCase();
+    if (!term) return this.users;
+    return this.users.filter(
+      (u) =>
+        u.username.toLowerCase().includes(term) ||
+        u.email.toLowerCase().includes(term) ||
+        u.role.toLowerCase().includes(term) ||
+        u.accountStatus.toLowerCase().includes(term)
+    );
+  }
+
+  get filteredPendingUsers(): User[] {
+    const term = this.pendingUserSearch.trim().toLowerCase();
+    if (!term) return this.pendingUsers;
+    return this.pendingUsers.filter(
+      (u) =>
+        u.username.toLowerCase().includes(term) ||
+        u.email.toLowerCase().includes(term)
+    );
   }
 
   refreshStats() {
@@ -97,6 +133,22 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  rejectUser(u: User) {
+  const confirmed = confirm(`Reject and delete the account request for "${u.username}"?`);
+  if (!confirmed) return;
+
+  this.adminService.deleteUser(u._id).subscribe({
+    next: () => {
+      this.pendingUsers = this.pendingUsers.filter((x) => x._id !== u._id);
+      this.refreshStats();
+    },
+    error: (err: any) => {
+      console.error('Reject user error:', err);
+      alert('Failed to reject user. Check console for details.');
+    },
+  });
+}
+
   suspend(u: User) {
     this.adminService.setUserStatus(u._id, 'suspended').subscribe((res) => {
       u.accountStatus = res.user.accountStatus;
@@ -119,11 +171,9 @@ export class AdminComponent implements OnInit {
     this.adminService.resolveReport(report._id, 'resolved').subscribe({
       next: (res) => {
         console.log(res);
-
         this.loadReports();
         this.refreshStats();
       },
-
       error: (err) => {
         console.log(err);
       },
@@ -134,11 +184,9 @@ export class AdminComponent implements OnInit {
     this.adminService.resolveReport(report._id, 'dismissed').subscribe({
       next: (res) => {
         console.log(res);
-
         this.loadReports();
         this.refreshStats();
       },
-
       error: (err) => {
         console.log(err);
       },
@@ -212,50 +260,54 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  showAddModal = false;
-addForm: { username: string; email: string; password: string; role: 'user' | 'admin' } = {
-  username: '',
-  email: '',
-  password: '',
-  role: 'user',
-};
-adding = false;
-
-openAddModal() {
-  this.addForm = { username: '', email: '', password: '', role: 'user' };
-  this.showAddModal = true;
-}
-
-closeAddModal() {
-  this.showAddModal = false;
-  this.adding = false;
-}
-
-saveAddUser() {
-  if (!this.addForm.username.trim() || !this.addForm.email.trim() || !this.addForm.password.trim()) {
-    alert('Username, email and password are required.');
-    return;
-  }
-  if (this.addForm.password.length < 6) {
-    alert('Password must be at least 6 characters.');
-    return;
+  openAddModal() {
+    this.addForm = { username: '', email: '', password: '', role: 'user' };
+    this.showAddModal = true;
   }
 
-  this.adding = true;
-  this.adminService.createUser(this.addForm).subscribe({
-    next: (res: { success: boolean; user: User }) => {
-      this.users.unshift(res.user);
-      this.refreshStats();
-      this.closeAddModal();
-    },
-    error: (err: any) => {
-      console.error('Create user error:', err);
-      alert(err?.error?.message || 'Failed to create user. Check console for details.');
-      this.adding = false;
-    },
+  closeAddModal() {
+    this.showAddModal = false;
+    this.adding = false;
+  }
+
+  saveAddUser() {
+    if (!this.addForm.username.trim() || !this.addForm.email.trim() || !this.addForm.password.trim()) {
+      alert('Username, email and password are required.');
+      return;
+    }
+    if (this.addForm.password.length < 6) {
+      alert('Password must be at least 6 characters.');
+      return;
+    }
+
+    this.adding = true;
+    this.adminService.createUser(this.addForm).subscribe({
+      next: (res: { success: boolean; user: User }) => {
+        this.users.unshift(res.user);
+        this.refreshStats();
+        this.closeAddModal();
+      },
+      error: (err: any) => {
+        console.error('Create user error:', err);
+        alert(err?.error?.message || 'Failed to create user. Check console for details.');
+        this.adding = false;
+      },
+    });
+  }
+  pendingPostSearch: string = '';
+
+get filteredPending(): Post[] {
+  const term = this.pendingPostSearch.trim().toLowerCase();
+  if (!term) return this.pending;
+  return this.pending.filter((post) => {
+    const username = this.authorName(post).toLowerCase();
+    const description = (post.description || '').toLowerCase();
+    const category = ((post as any).category || '').toLowerCase();
+    return (
+      username.includes(term) ||
+      description.includes(term) ||
+      category.includes(term)
+    );
   });
- }
-
-
-
+}
 }

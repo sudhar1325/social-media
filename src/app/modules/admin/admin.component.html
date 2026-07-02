@@ -1,6 +1,5 @@
 <div class="wrap">
   <h2>Admin dashboard</h2>
-
   <div class="stats" *ngIf="stats">
     <div class="stat">
       <span>{{ stats.pendingUsers }}</span>Pending users
@@ -18,10 +17,8 @@
       <span>{{ stats.openReports }}</span>reports
     </div>
   </div>
-
   <div class="tabs">
-    <button [class.active]="tab === 'users'" (click)="tab = 'users'">
-      All users <span class="badge" *ngIf="pendingUsers.length">{{ users.length }}</span>
+    <button [class.active]="tab === 'users'" (click)="tab = 'users'"> All users <span class="badge" *ngIf="users.length">{{ users.length }}</span>
     </button>
     <!-- <button [class.active]="tab === 'pendingUsers'" (click)="tab = 'pendingUsers'">
       Pending users -->
@@ -40,12 +37,12 @@
     </button>
 
   </div>
-
+  <!-- All users -->
   <div *ngIf="tab === 'users'">
     <div class="table-header">
+      <input type="text" class="search-input" placeholder="Search by username, email, role or status..." [(ngModel)]="userSearch" name="userSearch" />
       <button class="btn-add" (click)="openAddModal()">Add user</button>
     </div>
-
     <table>
       <thead>
         <tr>
@@ -57,7 +54,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let u of users">
+        <tr *ngFor="let u of filteredUsers">
           <td>{{ u.username }}</td>
           <td>{{ u.email }}</td>
           <td>{{ u.role }}</td>
@@ -72,28 +69,29 @@
         </tr>
       </tbody>
     </table>
+    <p class="empty" *ngIf="filteredUsers.length === 0">No users match your search.</p>
   </div>
-
+  <!-- Pending users -->
   <div *ngIf="tab === 'pendingUsers'">
-    <div class="card" *ngFor="let u of pendingUsers">
+    <input type="text" class="search-input" placeholder="Search pending users by username or email..." [(ngModel)]="pendingUserSearch" name="pendingUserSearch" />
+    <div class="card" *ngFor="let u of filteredPendingUsers">
       <div class="card-head">
         <span>{{ u.username }}</span>
         <span>{{ u.createdAt | date: "medium" }}</span>
       </div>
       <p class="email">{{ u.email }}</p>
       <div class="actions">
-        <button class="approve" (click)="approveUser(u)">
-          Approve account
-        </button>
+        <button class="approve" (click)="approveUser(u)"> Approve account </button>
+        <button class="reject" (click)="rejectUser(u)"> Reject account </button>
       </div>
     </div>
-    <p class="empty" *ngIf="pendingUsers.length === 0">
-      No accounts awaiting approval.
-    </p>
+    <p class="empty" *ngIf="filteredPendingUsers.length === 0"> No accounts awaiting approval. </p>
   </div>
-
+  <!-- Pending posts -->
+  
   <div *ngIf="tab === 'pending'">
-    <div class="card" *ngFor="let post of pending">
+    <input type="text" class="search-input" placeholder="Search by username, description or category..." [(ngModel)]="pendingPostSearch" name="pendingPostSearch" />
+    <div class="card" *ngFor="let post of filteredPending">
       <div class="card-head">
         <span>{{ authorName(post) }}</span>
         <span>{{ post.createdAt | date: "medium" }}</span>
@@ -108,39 +106,51 @@
     </div>
     <p class="empty" *ngIf="pending.length === 0">No posts awaiting review.</p>
   </div>
+  <!-- Reports -->
+  <div *ngIf="tab === 'reports'">
+    <div class="card" *ngFor="let report of reports">
+      <div class="card-head">
+        <span> Reported by: {{ report.reportedBy?.username }}
+        </span>
+        <span>
+          {{ report.createdAt | date: "medium" }}
+        </span>
+      </div>
+      <h4>Issue</h4>
+      <p>{{ report.reason }}</p>
+      <h4>Reported post</h4>
+      <p *ngIf="report.postId?.description">
+        {{ report.postId.description }}
+      </p>
+      <img *ngIf="report.postId?.mediaType === 'image'" [src]="fileBase + report.postId.mediaURL" />
+      <video *ngIf="report.postId?.mediaType === 'video'" [src]="fileBase + report.postId.mediaURL" controls></video>
+      <div class="actions">
+        <button class="approve" (click)="resolveReport(report)">Resolve</button>
+        <button class="reject" (click)="dismissReport(report)">Dismiss</button>
+      </div>
+    </div>
+    <p class="empty" *ngIf="reports.length === 0">No open reports.</p>
+  </div>
 </div>
-
+<!-- Edit user modal -->
 <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <h3>Edit user</h3>
-
-    <label>
-      Username
-      <input type="text" [(ngModel)]="editForm.username" name="username" />
+    <label> Username <input type="text" [(ngModel)]="editForm.username" name="username" />
     </label>
-
-    <label>
-      Email
-      <input type="email" [(ngModel)]="editForm.email" name="email" />
+    <label> Email <input type="email" [(ngModel)]="editForm.email" name="email" />
     </label>
-
-    <label>
-      Role
-      <select [(ngModel)]="editForm.role" name="role">
+    <label> Role <select [(ngModel)]="editForm.role" name="role">
         <option value="user">user</option>
         <option value="admin">admin</option>
       </select>
     </label>
-
-    <label>
-      Status
-      <select [(ngModel)]="editForm.accountStatus" name="accountStatus">
+    <label> Status <select [(ngModel)]="editForm.accountStatus" name="accountStatus">
         <option value="pending">pending</option>
         <option value="active">active</option>
         <option value="suspended">suspended</option>
       </select>
     </label>
-
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeEditModal()" [disabled]="saving">Cancel</button>
       <button class="btn-save" (click)="saveEdit()" [disabled]="saving">

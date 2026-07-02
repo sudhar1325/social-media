@@ -1,17 +1,39 @@
 <div class="wrap">
   <div class="card">
     <h2>Create a post</h2>
+
     <textarea [(ngModel)]="description" rows="4" placeholder="What's on your mind?"></textarea>
 
     <label class="file-label">
-      {{ fileName || 'Attach an image or video (optional)' }}
-      <input type="file" accept="image/*,video/*" (change)="onFile($event)" hidden />
+      <span>＋ Add photos / videos</span>
+      <input type="file" accept="image/*,video/*" multiple (change)="onFilesSelected($event)" hidden />
     </label>
 
-    <input class="category" [(ngModel)]="category" placeholder="Category (e.g. general)" />
+    <p class="limits-hint">
+      📷 Images: max 5 MB &nbsp;|&nbsp; 🎥 Videos: max 30 seconds
+    </p>
+
+    <div class="previews" *ngIf="selectedFiles.length > 0">
+      <div
+        class="preview-item"
+        *ngFor="let f of selectedFiles; let i = index"
+        [class.has-error]="f.error"
+      >
+        <img *ngIf="f.type === 'image'" [src]="f.previewUrl" />
+        <video *ngIf="f.type === 'video'" [src]="f.previewUrl"></video>
+        <button class="remove-btn" (click)="removeFile(i)" title="Remove">✕</button>
+        <span class="badge" [class.badge-error]="f.error">{{ f.type }}</span>
+        <div class="file-error" *ngIf="f.error">{{ f.error }}</div>
+      </div>
+    </div>
+
+    <input class="category-input" [(ngModel)]="category" placeholder="Category (e.g. general)" />
 
     <p class="hint">Your post will be reviewed by an admin before it appears in the feed.</p>
     <p class="error" *ngIf="error">{{ error }}</p>
-    <button (click)="submit()" [disabled]="loading">{{ loading ? 'Posting...' : 'Submit for review' }}</button>
+
+    <button (click)="submit()" [disabled]="loading || hasErrors">
+      {{ loading ? 'Posting...' : 'Submit for review' }}
+    </button>
   </div>
 </div>

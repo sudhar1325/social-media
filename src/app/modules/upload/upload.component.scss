@@ -6,23 +6,22 @@
 
 .card {
   width: 100%;
-  max-width: 480px;
+  max-width: 520px;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 1.8rem;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.8rem;
 }
 
 h2 {
-  margin: 0 0 0.3rem;
+  margin: 0 0 0.2rem;
   color: #14213d;
 }
 
-textarea,
-.category {
+textarea {
   padding: 0.6rem 0.7rem;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -31,13 +30,111 @@ textarea,
 }
 
 .file-label {
-  border: 1px dashed #aaa;
-  border-radius: 6px;
-  padding: 0.6rem;
-  text-align: center;
-  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1.5px dashed #aaa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.9rem;
   color: #555;
   cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.file-label:hover {
+  border-color: #14213d;
+  color: #14213d;
+}
+
+.limits-hint {
+  font-size: 0.78rem;
+  color: #888;
+  margin: -0.3rem 0 0;
+  text-align: center;
+}
+
+.previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+  aspect-ratio: 1;
+  border: 2px solid transparent;
+}
+
+.preview-item.has-error {
+  border-color: #c0392b;
+}
+
+.preview-item img,
+.preview-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.badge.badge-error {
+  background: #c0392b;
+}
+
+.file-error {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(192, 57, 43, 0.88);
+  color: #fff;
+  font-size: 0.68rem;
+  padding: 0.3rem 0.4rem;
+  line-height: 1.3;
+  z-index: 2;
+}
+
+.category-input {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
 }
 
 .hint {
@@ -58,9 +155,10 @@ button {
   border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
+  font-size: 0.95rem;
 }
 
 button:disabled {
-  opacity: 0.6;
-  cursor: default;
+  opacity: 0.5;
+  cursor: not-allowed;
 }

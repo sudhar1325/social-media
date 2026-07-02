@@ -1,35 +1,99 @@
 <div class="feed">
   <h2>Community feed</h2>
+
   <p class="empty" *ngIf="!loading && posts.length === 0">
     Nothing here yet. Be the first to post.
   </p>
 
-  <div class="card" *ngFor="let post of posts">
-    <!-- <Link>{{ authorName(post) }}</Link> -->
-    <div class="card-head">
-      <span class="username">{{ authorName(post) }}</span>
-      <span class="date">{{ post.createdAt | date: 'medium' }}</span>
-    </div>
-    <p class="desc" *ngIf="post.description">{{ post.description }}</p>
-    <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
-    <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+  <div class="post-card" *ngFor="let post of posts">
 
-    <div class="actions">
-      <button (click)="toggleLike(post)">▲ {{ post.likeCount }}</button>
-      <button (click)="toggleComments(post)">💬 {{ post.commentCount }}</button>
-      <button (click)="report(post)">Report</button>
+    <!-- Top row: avatar + username + date -->
+    <div class="post-top">
+      <div
+        class="author"
+        [routerLink]="['/users', getAuthorId(post)]"
+      >
+        <div class="author-avatar">
+          <img
+            *ngIf="getAuthorImage(post)"
+            [src]="avatarUrl(getAuthorImage(post))"
+            alt="avatar"
+          />
+          <span *ngIf="!getAuthorImage(post)">
+            {{ authorName(post).charAt(0).toUpperCase() }}
+          </span>
+        </div>
+        <span class="post-username">{{ authorName(post) }}</span>
+      </div>
+      <span class="post-date">{{ post.createdAt | date: 'medium' }}</span>
     </div>
 
-    <div class="comments" *ngIf="openComments[post._id]">
-      <div class="comment" *ngFor="let c of comments[post._id]">
-        <strong>{{ authorName(c) }}:</strong> {{ c.comment }}
+    <!-- Description -->
+    <p class="post-desc" *ngIf="post.description">{{ post.description }}</p>
+
+    <!-- Carousel (multiple files) -->
+    <div class="carousel" *ngIf="post.mediaFiles && post.mediaFiles.length > 0">
+      <div class="carousel-track">
+        <div
+          class="carousel-slide"
+          *ngFor="let m of post.mediaFiles; let i = index"
+          [class.active]="i === currentSlide(post._id)"
+        >
+          <img *ngIf="m.type === 'image'" [src]="fileBase + m.url" />
+          <video *ngIf="m.type === 'video'" [src]="fileBase + m.url" controls></video>
+        </div>
+      </div>
+      <ng-container *ngIf="post.mediaFiles.length > 1">
+        <button class="arrow arrow-left" (click)="prevSlide(post, $event)">&#8592;</button>
+        <button class="arrow arrow-right" (click)="nextSlide(post, $event)">&#8594;</button>
+        <div class="dots">
+          <span
+            *ngFor="let m of post.mediaFiles; let i = index"
+            class="dot"
+            [class.active]="i === currentSlide(post._id)"
+            (click)="goToSlide(post, i)"
+          ></span>
+        </div>
+        <div class="counter">{{ currentSlide(post._id) + 1 }} / {{ post.mediaFiles.length }}</div>
+      </ng-container>
+    </div>
+
+    <!-- Fallback single media -->
+    <div
+      class="single-media"
+      *ngIf="(!post.mediaFiles || post.mediaFiles.length === 0) && post.mediaURL"
+    >
+      <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
+      <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="post-actions">
+      <button
+        class="action-btn"
+        [class.liked]="likedPosts.has(post._id)"
+        (click)="toggleLike(post)"
+      >&#9650; {{ post.likeCount }}</button>
+      <button class="action-btn" (click)="toggleComments(post)">
+        &#128172; {{ post.commentCount }}
+      </button>
+      <button class="action-btn report" (click)="report(post)">&#9872; Report</button>
+    </div>
+
+    <!-- Comments -->
+    <div class="comments-section" *ngIf="openComments[post._id]">
+      <div class="comment-item" *ngFor="let c of comments[post._id]">
+        <strong>{{ authorName(c) }}</strong> {{ c.comment }}
       </div>
       <div class="add-comment">
         <input [(ngModel)]="newComment[post._id]" placeholder="Write a comment..." />
         <button (click)="submitComment(post)">Send</button>
       </div>
     </div>
+
   </div>
 
-  <button class="load-more" *ngIf="page < totalPages" (click)="loadMore()">Load more</button>
+  <button class="load-more" *ngIf="page < totalPages" (click)="loadMore()">
+    Load more
+  </button>
 </div>

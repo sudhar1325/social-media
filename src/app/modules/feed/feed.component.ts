@@ -31,7 +31,7 @@ export class FeedComponent implements OnInit {
   newComment: Record<string, string> = {};
   likedPosts = new Set<string>();
 
-  constructor(private postService: PostService) { }
+  constructor(private postService: PostService) {}
 
   ngOnInit() {
     this.fetch();
@@ -41,11 +41,10 @@ export class FeedComponent implements OnInit {
     this.loading = true;
     this.postService.getFeed(this.page).subscribe({
       next: (res) => {
-        res.posts.forEach((p) => (this.slideIndex[p._id] = 0));
-        this.posts = [...this.posts, ...res.posts];
-        this.filteredPosts = this.posts;
-        this.totalPages = res.totalPages;
-        this.loading = false;
+            this.posts = [...this.posts, ...res.posts];
+            this.filteredPosts = this.posts;
+            this.totalPages = res.totalPages;
+            this.loading = false;
       },
       error: () => {
         this.loading = false;
@@ -71,7 +70,7 @@ export class FeedComponent implements OnInit {
 
   getAuthorImage(post: Post): string {
     const u = post.userId as User;
-    return typeof u === 'object' ? (u.profileImage || '') : '';
+    return typeof u === 'object' ? u.profileImage || '' : '';
   }
 
   avatarUrl(path: string): string {
@@ -142,25 +141,28 @@ export class FeedComponent implements OnInit {
   report(post: Post) {
     const reason = prompt('Why are you reporting this post?');
     if (!reason) return;
-    this.postService.reportPost(post._id, reason).subscribe(() => alert('Report submitted'));
+    this.postService
+      .reportPost(post._id, reason)
+      .subscribe(() => alert('Report submitted'));
   }
 
   searchLive() {
     const value = this.searchText.toLowerCase().trim();
+
     if (!value) {
       this.filteredPosts = this.posts;
       return;
     }
+
     this.filteredPosts = this.posts.filter((post) => {
-      // username search
       const username =
         typeof post.userId === 'object'
           ? post.userId.username?.toLowerCase() || ''
           : '';
-      // description search
+
       const description = post.description?.toLowerCase() || '';
-      // category search
       const category = post.category?.toLowerCase() || '';
+
       return (
         username.includes(value) ||
         description.includes(value) ||

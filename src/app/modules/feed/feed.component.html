@@ -6,8 +6,10 @@
   </div>
 
   <p class="empty" *ngIf="!loading && filteredPosts.length === 0">
+  No posts found.
+</p>
 
-  <div class="post-card" *ngFor="let post of posts">
+  <div class="post-card" *ngFor="let post of filteredPosts">
 
     <!-- Top row: avatar + username + date -->
     <div class="post-top">

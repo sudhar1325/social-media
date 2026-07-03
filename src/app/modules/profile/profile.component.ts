@@ -5,7 +5,8 @@ import { PostService } from '../../core/services/post.service';
 import { UserService } from '../../core/services/user.service';
 import { Post, User } from '../../core/models/models';
 import { environment } from '../../../environments/environment';
-
+import { ToastService } from '../../core/services/toast.service';
+import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -27,7 +28,12 @@ export class ProfileComponent implements OnInit {
   saving = false;
   saveError = '';
 
-  constructor(private postService: PostService, private userService: UserService) {}
+  constructor(
+    private postService: PostService,
+    private userService: UserService,
+    private toast: ToastService,
+    private confirmDialog: ConfirmDialogService,
+  ) {}
 
   ngOnInit() {
     this.loadProfile();
@@ -104,9 +110,32 @@ export class ProfileComponent implements OnInit {
   }
 
   remove(post: Post) {
-    if (!confirm('Delete this post?')) return;
-    this.postService.deletePost(post._id).subscribe(() => {
-      this.posts = this.posts.filter((p) => p._id !== post._id);
-    });
+    this.confirmDialog.open(
+      'Delete Post',
+      'Are you sure you want to permanently delete this post?',
+      (confirmed: any) => {
+        if (!confirmed) {
+          return;
+        }
+        this.postService.deletePost(post._id).subscribe({
+          next: () => {
+            this.posts = this.posts.filter((p) => p._id !== post._id);
+            this.toast.success(
+              'Post Deleted',
+              'Your post has been deleted successfully.',
+            );
+          },
+
+          error: (err) => {
+            this.toast.error(
+              'Delete Failed',
+              err.error?.message || 'Unable to delete post.',
+            );
+          },
+        });
+      },
+      'Delete',
+      'Cancel',
+    );
   }
 }

@@ -5,19 +5,23 @@ import { RouterLink } from '@angular/router';
 import { PostService } from '../../core/services/post.service';
 import { Post, User } from '../../core/models/models';
 import { environment } from '../../../environments/environment';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { LightboxComponent } from '../../shared/lightbox/lightbox.component';
+import { LoadingService } from '../../core/services/loading.service';
+import { Subject, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SkeletonComponent, LightboxComponent],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss',
 })
-export class FeedComponent implements OnInit {
+export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
   posts: Post[] = [];
   page = 1;
   totalPages = 1;
-  loading = false;
   fileBase = environment.fileBaseUrl;
   searchText = '';
   filteredPosts: Post[] = [];
@@ -30,32 +34,85 @@ export class FeedComponent implements OnInit {
   comments: Record<string, any[]> = {};
   newComment: Record<string, string> = {};
   likedPosts = new Set<string>();
+  initialLoading = true;
+  loadingMore = false;
+  @ViewChild('scrollTrigger')
+  scrollTrigger!: ElementRef;
+  @ViewChild('lightbox')
+  lightbox!: LightboxComponent;
 
-  constructor(private postService: PostService) {}
+  openLightbox(post: any, index: number) {
+    const images = post.mediaFiles
+      .filter((m: any) => m.type === 'image')
+      .map((m: any) => this.fileBase + m.url);
+
+    this.lightbox.open(images, index);
+  }
+
+  openSingle(post: any) {
+    this.lightbox.open([this.fileBase + post.mediaURL], 0);
+  }
+
+  private searchSubject = new Subject<string>();
+  private observer!: IntersectionObserver;
+  constructor(private postService: PostService, public loading: LoadingService) {}
 
   ngOnInit() {
+    this.searchSubject
+  .pipe(debounceTime(300))
+  .subscribe(() => {
+    this.searchLive();
+  });
     this.fetch();
   }
 
-  fetch() {
-    this.loading = true;
-    this.postService.getFeed(this.page).subscribe({
-      next: (res) => {
-            this.posts = [...this.posts, ...res.posts];
-            this.filteredPosts = this.posts;
-            this.totalPages = res.totalPages;
-            this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-      },
-    });
+fetch() {
+
+  if (this.page === 1) {
+    this.initialLoading = true;
+  } else {
+    this.loadingMore = true;
   }
 
-  loadMore() {
-    this.page++;
-    this.fetch();
-  }
+  this.postService.getFeed(this.page).subscribe({
+
+    next: (res) => {
+
+      if (this.page === 1) {
+        this.posts = res.posts;
+      } else {
+        this.posts = [...this.posts, ...res.posts];
+      }
+
+      this.filteredPosts = [...this.posts];
+      this.totalPages = res.totalPages;
+
+      this.initialLoading = false;
+      this.loadingMore = false;
+
+    },
+
+    error: () => {
+
+      this.initialLoading = false;
+      this.loadingMore = false;
+
+    }
+
+  });
+
+}
+loadMore() {
+
+  if (this.loadingMore) return;
+
+  if (this.page >= this.totalPages) return;
+
+  this.page++;
+
+  this.fetch();
+
+}
 
   // ── Author helpers ─────────────────────────────────────────
   authorName(item: any): string {
@@ -169,5 +226,45 @@ export class FeedComponent implements OnInit {
         category.includes(value)
       );
     });
+  }
+
+  onSearchInput(){
+
+    this.searchSubject.next(this.searchText);
+
+}
+clearSearch(){
+
+    this.searchText='';
+
+    this.filteredPosts=this.posts;
+
+}
+
+  ngAfterViewInit(): void {
+    this.createObserver();
+  }
+  createObserver() {
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !this.loadingMore &&
+          this.page < this.totalPages
+        ) {
+          this.loadMore();
+        }
+      },
+      {
+        root: null,
+        threshold: 0.2,
+      },
+    );
+    this.observer.observe(this.scrollTrigger.nativeElement);
+  }
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 }

@@ -1,48 +1,429 @@
+// =============================================================================
+// NAVBAR — Premium Frosted-Glass Navigation
+// Vercel / GitHub / Linear / Notion inspired
+// Targets existing markup only: .navbar .brand .links .links a .links button .user
+// =============================================================================
+@use 'sass:color';
+// -----------------------------------------------------------------------------
+// Variables
+// -----------------------------------------------------------------------------
+$nav-height: 64px;
+$nav-height-mobile: 58px;
+$nav-primary: #2563eb;
+$nav-primary-hover: #1d4ed8;
+$nav-danger: #ef4444;
+$nav-bg-light: rgba(255, 255, 255, 0.72);
+$nav-border-light: rgba(15, 23, 42, 0.08);
+$nav-text-light: #0f172a;
+$nav-text-muted-light: #64748b;
+$nav-pill-hover-light: rgba(15, 23, 42, 0.05);
+$nav-bg-dark: rgba(15, 23, 42, 0.72);
+$nav-border-dark: rgba(255, 255, 255, 0.08);
+$nav-text-dark: #f1f5f9;
+$nav-text-muted-dark: #94a3b8;
+$nav-pill-hover-dark: rgba(255, 255, 255, 0.06);
+$nav-blur: 18px;
+$nav-radius: 10px;
+$nav-radius-full: 999px;
+$nav-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+$nav-shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+$nav-shadow-focus: 0 0 0 3px rgba($nav-primary, 0.35);
+$nav-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$nav-transition: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+$nav-transition-spring: 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+$nav-z: 500;
+$breakpoints: (
+  sm: 480px,
+  md: 768px,
+  lg: 1024px
+);
+// -----------------------------------------------------------------------------
+// Mixins
+// -----------------------------------------------------------------------------
+@mixin respond-max($bp) {
+  @media (max-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
+}
+@mixin respond-min($bp) {
+  @media (min-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
+}
+@mixin frosted-glass($bg, $blur: $nav-blur) {
+  background: $bg;
+  backdrop-filter: blur($blur) saturate(180%);
+  -webkit-backdrop-filter: blur($blur) saturate(180%);
+}
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $nav-shadow-focus;
+  }
+}
+@mixin nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding-inline: 14px;
+  border-radius: $nav-radius-full;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background $nav-transition-fast, color $nav-transition-fast, transform $nav-transition-fast;
+}
+@mixin custom-scrollbar($thumb) {
+  scrollbar-width: thin;
+  scrollbar-color: $thumb transparent;
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $thumb;
+    border-radius: $nav-radius-full;
+  }
+}
+@mixin underline-animate($color: $nav-primary) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    border-radius: $nav-radius-full;
+    background: $color;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform $nav-transition;
+  }
+  &:hover::after {
+    transform: scaleX(1);
+  }
+  &.active::after,
+  &[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+}
+// -----------------------------------------------------------------------------
+// Root theme tokens (light default, dark override below)
+// -----------------------------------------------------------------------------
+:root {
+  --nav-bg: #{$nav-bg-light};
+  --nav-border: #{$nav-border-light};
+  --nav-text: #{$nav-text-light};
+  --nav-text-muted: #{$nav-text-muted-light};
+  --nav-pill-hover: #{$nav-pill-hover-light};
+}
+.dark,
+[data-theme='dark'] {
+  --nav-bg: #{$nav-bg-dark};
+  --nav-border: #{$nav-border-dark};
+  --nav-text: #{$nav-text-dark};
+  --nav-text-muted: #{$nav-text-muted-dark};
+  --nav-pill-hover: #{$nav-pill-hover-dark};
+}
+// -----------------------------------------------------------------------------
+// .navbar — sticky frosted-glass shell
+// -----------------------------------------------------------------------------
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: $nav-z;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.5rem;
-  background: #14213d;
-  color: #fff;
+  gap: 24px;
+  height: $nav-height;
+  padding-inline: 32px;
+  color: var(--nav-text);
+  @include frosted-glass(var(--nav-bg));
+  border-bottom: 1px solid var(--nav-border);
+  box-shadow: $nav-shadow;
+  transition: box-shadow $nav-transition, background $nav-transition, border-color $nav-transition;
+  // subtle elevation once page has scrolled — toggled via JS class
+  &.is-scrolled {
+    box-shadow: $nav-shadow-lg;
+  }
+  @include respond-max(md) {
+    height: $nav-height-mobile;
+    padding-inline: 16px;
+  }
+  // -----------------------------------------------------------------------
+  // .brand
+  // -----------------------------------------------------------------------
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--nav-text);
+    flex-shrink: 0;
+    transition: transform $nav-transition-fast, color $nav-transition-fast;
+    @include focus-ring;
+    img,
+    svg {
+      width: 28px;
+      height: 28px;
+      transition: transform $nav-transition-spring;
+    }
+    &:hover {
+      color: $nav-primary;
+      img,
+      svg {
+        transform: rotate(-8deg) scale(1.06);
+      }
+    }
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+  // -----------------------------------------------------------------------
+  // .links — desktop pill nav + collapsible mobile panel
+  // -----------------------------------------------------------------------
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+    @include custom-scrollbar(var(--nav-border));
+    a {
+      @include nav-pill;
+      @include underline-animate($nav-primary);
+      color: var(--nav-text-muted);
+      @include focus-ring;
+      &:hover {
+        background: var(--nav-pill-hover);
+        color: var(--nav-text);
+      }
+      &.active,
+      &[aria-current='page'] {
+        background: var(--nav-pill-hover);
+        color: var(--nav-text);
+        font-weight: 600;
+      }
+    }
+    button {
+      @include nav-pill;
+      border: 1px solid var(--nav-border);
+      background: transparent;
+      color: var(--nav-text);
+      cursor: pointer;
+      @include focus-ring;
+      &:hover {
+        background: var(--nav-pill-hover);
+        border-color: color.adjust($nav-primary, $alpha: -0.6);
+        transform: translateY(-1px);
+      }
+      &:active {
+        transform: translateY(0) scale(0.97);
+      }
+      // logout / destructive action styling
+      &.logout,
+      &[data-variant='danger'] {
+        border-color: rgba($nav-danger, 0.25);
+        color: $nav-danger;
+        &:hover {
+          background: rgba($nav-danger, 0.08);
+          border-color: rgba($nav-danger, 0.4);
+        }
+      }
+    }
+    @include respond-max(md) {
+      position: fixed;
+      inset: $nav-height-mobile 0 0 0;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 4px;
+      padding: 16px;
+      background: var(--nav-bg);
+      @include frosted-glass(var(--nav-bg));
+      border-top: 1px solid var(--nav-border);
+      overflow-y: auto;
+      transform: translateY(-8px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity $nav-transition, transform $nav-transition, visibility $nav-transition;
+      a,
+      button {
+        width: 100%;
+        justify-content: flex-start;
+        height: 46px;
+        border-radius: $nav-radius;
+        font-size: 0.95rem;
+      }
+      a::after {
+        display: none;
+      }
+      // toggled by Angular via [class.is-open]="menuOpen" on the same .links element
+      &.is-open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+    }
+  }
+  // -----------------------------------------------------------------------
+  // .user — avatar / account cluster
+  // -----------------------------------------------------------------------
+  .user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    padding: 4px 6px 4px 4px;
+    border-radius: $nav-radius-full;
+    cursor: pointer;
+    transition: background $nav-transition-fast;
+    @include focus-ring;
+    img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--nav-bg);
+      box-shadow: 0 0 0 1px var(--nav-border);
+      transition: box-shadow $nav-transition-fast;
+    }
+    span {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--nav-text);
+      @include respond-max(sm) {
+        display: none;
+      }
+    }
+    &:hover {
+      background: var(--nav-pill-hover);
+      img {
+        box-shadow: 0 0 0 2px $nav-primary;
+      }
+    }
+  }
 }
-
-.brand {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #fca311;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-}
-
-.links {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-}
-
-.links a {
-  color: #e5e5e5;
-  text-decoration: none;
-  font-size: 0.95rem;
-}
-
-.links a.active {
-  color: #fca311;
-  font-weight: 600;
-}
-
-.user {
-  color: #9aa5b1;
-  font-size: 0.85rem;
-}
-
-button {
-  background: #fca311;
+// -----------------------------------------------------------------------------
+// Hamburger toggle — required for mobile nav collapse of .links
+// Rendered as the mobile-only trigger button; markup expected as
+// <button class="nav-toggle" aria-controls="links"> inside .navbar
+// -----------------------------------------------------------------------------
+.nav-toggle {
+  display: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: $nav-radius;
+  background: transparent;
   border: none;
-  color: #14213d;
-  font-weight: 600;
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
   cursor: pointer;
+  flex-shrink: 0;
+  @include focus-ring;
+  span {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    border-radius: $nav-radius-full;
+    background: var(--nav-text);
+    transition: transform $nav-transition, opacity $nav-transition-fast, top $nav-transition;
+    &:nth-child(1) { top: 14px; }
+    &:nth-child(2) { top: 20px; }
+    &:nth-child(3) { top: 26px; }
+  }
+  &:hover {
+    background: var(--nav-pill-hover);
+  }
+  &.is-active {
+    span:nth-child(1) {
+      top: 20px;
+      transform: rotate(45deg);
+    }
+    span:nth-child(2) {
+      opacity: 0;
+    }
+    span:nth-child(3) {
+      top: 20px;
+      transform: rotate(-45deg);
+    }
+  }
+  @include respond-max(md) {
+    display: block;
+  }
+}
+// -----------------------------------------------------------------------------
+// Tablet layout refinements
+// -----------------------------------------------------------------------------
+@include respond-max(lg) {
+  .navbar {
+    padding-inline: 24px;
+    gap: 16px;
+    .links a,
+    .links button {
+      padding-inline: 12px;
+      font-size: 0.8125rem;
+    }
+    .user span {
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+// -----------------------------------------------------------------------------
+// Mobile layout refinements
+// -----------------------------------------------------------------------------
+@include respond-max(md) {
+  .navbar {
+    .links {
+      order: 3;
+    }
+    .user {
+      order: 2;
+    }
+    .nav-toggle {
+      order: 1;
+      margin-left: auto;
+    }
+  }
+}
+// -----------------------------------------------------------------------------
+// Reduced motion & high-contrast accessibility
+// -----------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .navbar .brand,
+  .navbar .brand img,
+  .navbar .brand svg,
+  .navbar .links,
+  .navbar .links a,
+  .navbar .links a::after,
+  .navbar .links button,
+  .navbar .user,
+  .navbar .user img,
+  .nav-toggle span {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .navbar {
+    border-bottom-width: 2px;
+    .links a,
+    .links button {
+      border: 1px solid var(--nav-border);
+    }
+  }
 }

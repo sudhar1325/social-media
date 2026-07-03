@@ -159,49 +159,6 @@
     </div>
   </div>
 </div>
-<div class="wrap">
-  <div *ngIf="tab === 'reports'">
-    <div class="card" *ngFor="let report of reports">
-      <div class="card-head">
-        <span>
-          Reported by:
-          {{ report.reportedBy?.username }}
-        </span>
-
-        <span>
-          {{ report.createdAt | date: "medium" }}
-        </span>
-      </div>
-
-      <h4>Issue</h4>
-
-      <p>
-        {{ report.reason }}
-      </p>
-
-      <h4>Reported post</h4>
-
-      <p *ngIf="report.postId?.description">
-        {{ report.postId.description }}
-      </p>
-
-      <img *ngIf="report.postId?.mediaType === 'image'" [src]="fileBase + report.postId.mediaURL" />
-
-      <video *ngIf="report.postId?.mediaType === 'video'" [src]="fileBase + report.postId.mediaURL" controls></video>
-
-      <div class="actions">
-        <button class="approve" (click)="resolveReport(report)">Resolve</button>
-
-        <button class="reject" (click)="dismissReport(report)">Dismiss</button>
-      </div>
-    </div>
-
-    <p class="empty" *ngIf="reports.length === 0">No open reports.</p>
-  </div>
-</div>
-
-
-
 <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <h3>Add user</h3>

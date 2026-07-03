@@ -1,0 +1,41 @@
+<div
+  class="overlay"
+  *ngIf="dialog">
+
+  <div class="dialog">
+
+    <div class="dialog-icon">
+      ⚠️
+    </div>
+
+    <h2>
+      {{dialog.title}}
+    </h2>
+
+    <p>
+      {{dialog.message}}
+    </p>
+
+    <div class="actions">
+
+      <button
+        class="cancel"
+        (click)="cancel()">
+
+        {{dialog.cancelText}}
+
+      </button>
+
+      <button
+        class="confirm"
+        (click)="confirm()">
+
+        {{dialog.confirmText}}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

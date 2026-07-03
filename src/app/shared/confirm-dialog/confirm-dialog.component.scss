@@ -1,0 +1,142 @@
+.overlay{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+
+    animation:fade .25s;
+}
+
+.dialog{
+
+    width:420px;
+    max-width:92%;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:32px;
+
+    text-align:center;
+
+    animation:popup .25s;
+
+    box-shadow:0 25px 60px rgba(0,0,0,.25);
+}
+
+.dialog-icon{
+
+    font-size:55px;
+
+    margin-bottom:15px;
+}
+
+.dialog h2{
+
+    margin:0;
+
+    color:#111827;
+
+    font-size:24px;
+}
+
+.dialog p{
+
+    margin:18px 0 28px;
+
+    color:#6b7280;
+
+    line-height:1.6;
+}
+
+.actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:14px;
+}
+
+.actions button{
+
+    border:none;
+
+    padding:12px 26px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.25s;
+}
+
+.cancel{
+
+    background:#e5e7eb;
+}
+
+.cancel:hover{
+
+    background:#d1d5db;
+}
+
+.confirm{
+
+    background:#dc2626;
+
+    color:white;
+}
+
+.confirm:hover{
+
+    background:#b91c1c;
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+}
+
+to{
+
+opacity:1;
+
+}
+
+}
+
+@keyframes popup{
+
+from{
+
+opacity:0;
+
+transform:scale(.85);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}

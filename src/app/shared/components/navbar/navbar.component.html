@@ -3,9 +3,10 @@
   <div class="links" *ngIf="auth.isLoggedIn()">
     <a routerLink="/feed" routerLinkActive="active">Feed</a>
     <a routerLink="/upload" routerLinkActive="active">Post</a>
-    <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    <a routerLink="/profile" routerLinkActive="active">
+      <span class="user">{{ auth.currentUser()?.username }}</span>
+    </a>
     <a routerLink="/admin" routerLinkActive="active" *ngIf="auth.isAdmin()">Admin</a>
-    <span class="user">{{ auth.currentUser()?.username }}</span>
     <button (click)="auth.logout()">Logout</button>
   </div>
   <div class="links" *ngIf="!auth.isLoggedIn()">

@@ -1,9 +1,7 @@
 <div class="wrap">
   <div class="card">
     <h2>Create a post</h2>
-
     <textarea [(ngModel)]="description" rows="4" placeholder="What's on your mind?"></textarea>
-
     <div
   class="drop-zone"
   [class.dragging]="dragging"
@@ -11,21 +9,11 @@
   (dragleave)="onDragLeave($event)"
   (drop)="onDrop($event)"
 >
-
   <div class="drop-content">
-
-    <div class="upload-icon">
-      📸
-    </div>
-
     <h3>Drag & Drop Photos or Videos</h3>
-
     <p>or click below to browse</p>
-
     <label class="file-label">
-
       <span>Browse Files</span>
-
       <input
         type="file"
         accept="image/*,video/*"
@@ -33,21 +21,15 @@
         hidden
         (change)="onFilesSelected($event)"
       />
-
     </label>
-
     <div class="supported">
       JPG • PNG • WEBP • MP4 • MOV
     </div>
-
   </div>
-
 </div>
-
     <p class="limits-hint">
       📷 Images: max 5 MB &nbsp;|&nbsp; 🎥 Videos: max 30 seconds
     </p>
-
     <div class="previews" *ngIf="selectedFiles.length > 0">
       <div
         class="preview-item"
@@ -61,12 +43,9 @@
         <div class="file-error" *ngIf="f.error">{{ f.error }}</div>
       </div>
     </div>
-
     <input class="category-input" [(ngModel)]="category" placeholder="Category (e.g. general)" />
-
     <p class="hint">Your post will be reviewed by an admin before it appears in the feed.</p>
     <p class="error" *ngIf="error">{{ error }}</p>
-
     <button (click)="submit()" [disabled]="loading || hasErrors">
       {{ loading ? 'Posting...' : 'Submit for review' }}
     </button>

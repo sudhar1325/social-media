@@ -2,25 +2,17 @@
   <h2>Community feed</h2>
   <!-- SEARCH -->
   <div class="search-box">
-
     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
     <input type="text" placeholder="Search posts, users, categories..." [(ngModel)]="searchText"
       (input)="onSearchInput()" />
-
     <button *ngIf="searchText" class="clear-btn" (click)="clearSearch()">
-
       <i class="fa-solid fa-xmark"></i>
-
     </button>
-
   </div>
 
   <div *ngIf="initialLoading">
     <p class="result-count" *ngIf="searchText">
-
       {{filteredPosts.length}} result(s) found
-
     </p>
     <div class="post-card skeleton-post" *ngFor="let i of [1, 2, 3, 4, 5]">
       <div class="post-top">
@@ -45,14 +37,11 @@
   </div>
 
   <div class="empty" *ngIf="!initialLoading && filteredPosts.length===0">
-
     <i class="fa-solid fa-magnifying-glass"></i>
-
     <h3>No Results</h3>
-
     <p>Try another keyword.</p>
-
   </div>
+
   <div *ngIf="!initialLoading">
     <div class="post-card" *ngFor="let post of filteredPosts">
       <!-- Top row: avatar + username + date -->
@@ -73,56 +62,82 @@
       <p class="post-desc" *ngIf="post.description">{{ post.description }}</p>
 
       <!-- Carousel (multiple files) -->
-      <div class="carousel" *ngIf="post.mediaFiles && post.mediaFiles.length > 0">
-        <div class="carousel-track">
-          <div class="carousel-slide" *ngFor="let m of post.mediaFiles; let i = index"
-            [class.active]="i === currentSlide(post._id)">
-            <img *ngIf="m.type === 'image'" [src]="fileBase + m.url" (click)="openLightbox(post, i)" />
-            <video *ngIf="m.type === 'video'" [src]="fileBase + m.url" controls></video>
+      <div class="carousel">
+        <div class="carousel-track" [style.transform]="'translateX(-'+currentSlide(post._id)*100+'%)'">
+          <div class="carousel-slide" *ngFor="let m of post.mediaFiles; let i = index">
+            <img *ngIf="m.type === 'image'" [src]="fileBase + m.url" loading="lazy" decoding="async"
+              (click)="openLightbox(post, i)" />
+            <video *ngIf="m.type === 'video'" [src]="fileBase + m.url" preload="metadata" controls>
+            </video>
           </div>
         </div>
-        <ng-container *ngIf="post.mediaFiles.length > 1">
-          <button class="arrow arrow-left" (click)="prevSlide(post, $event)">
-            &#8592;
-          </button>
-          <button class="arrow arrow-right" (click)="nextSlide(post, $event)">
-            &#8594;
-          </button>
-          <div class="dots">
-            <span *ngFor="let m of post.mediaFiles; let i = index" class="dot"
-              [class.active]="i === currentSlide(post._id)" (click)="goToSlide(post, i)"></span>
-          </div>
-          <div class="counter">
-            {{ currentSlide(post._id) + 1 }} / {{ post.mediaFiles.length }}
-          </div>
-        </ng-container>
+        <button *ngIf="post.mediaFiles.length > 1" class="arrow arrow-left" (click)="prevSlide(post, $event)">
+          &#8592;
+        </button>
+        <button *ngIf="post.mediaFiles.length > 1" class="arrow arrow-right" (click)="nextSlide(post, $event)">
+          &#8594;
+        </button>
+        <div class="dots">
+          <span *ngFor="let m of post.mediaFiles; let i = index" class="dot"
+            [class.active]="i === currentSlide(post._id)" (click)="goToSlide(post, i)"></span>
+        </div>
+        <div class="counter">
+          {{ currentSlide(post._id) + 1 }} / {{ post.mediaFiles.length }}
+        </div>
       </div>
 
       <!-- Fallback single media -->
       <div class="single-media" *ngIf="
           (!post.mediaFiles || post.mediaFiles.length === 0) && post.mediaURL
         ">
-        <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" (click)="openSingle(post)" />
-        <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+        <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" loading="lazy" decoding="async"
+          (click)="openSingle(post)" />
+        <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" preload="metadata" controls>
+        </video>
       </div>
 
       <!-- Action buttons -->
       <div class="post-actions">
         <button class="action-btn" [class.liked]="likedPosts.has(post._id)" (click)="toggleLike(post)">
-          &#9650; {{ post.likeCount }}
+          <i class="fa-regular fa-thumbs-up"></i> {{ post.likeCount }}
         </button>
         <button class="action-btn" (click)="toggleComments(post)">
-          &#128172; {{ post.commentCount }}
+          <i class="fa-regular fa-comment"></i> {{ post.commentCount }}
         </button>
-        <button class="action-btn report" (click)="report(post)">
-          &#9872; Report
+        <button class="action-btn report" (click)="openReportModal(post)">
+          <i class="fa-regular fa-flag"></i> Report
         </button>
       </div>
 
       <!-- Comments -->
       <div class="comments-section" *ngIf="openComments[post._id]">
         <div class="comment-item" *ngFor="let c of comments[post._id]">
-          <strong>{{ authorName(c) }}</strong> {{ c.comment }}
+          <!-- Avatar -->
+          <div class="comment-avatar">
+            <img *ngIf="getAuthorImage(c)" [src]="avatarUrl(getAuthorImage(c))" alt="avatar">
+            <span *ngIf="!getAuthorImage(c)">
+              {{ authorName(c).charAt(0).toUpperCase() }}
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="comment-body">
+            <div class="comment-header">
+              <div class="comment-user">
+                <span class="username">
+                  {{ authorName(c) }}
+                </span>
+                <span class="time">
+                  {{ c.createdAt | date:'short' }}
+                </span>
+              </div>
+              <button *ngIf="isMyComment(post,c)" class="delete-comment" (click)="openDeleteModal(post,c)">
+                <i class="fa-solid fa-trash"></i>Delete
+              </button>
+            </div>
+            <p class="comment-text">
+              {{ c.comment }}
+            </p>
+          </div>
         </div>
         <div class="add-comment">
           <input [(ngModel)]="newComment[post._id]" placeholder="Write a comment..." />
@@ -130,11 +145,67 @@
         </div>
       </div>
     </div>
-
     <div class="loading-more" *ngIf="loadingMore">
       <app-skeleton height="200px" width="100%"></app-skeleton>
     </div>
   </div>
 </div>
 <div #scrollTrigger class="scroll-trigger"></div>
+<!-- Report Modal -->
+<div class="modal-overlay" *ngIf="reportModalOpen" (click)="closeReportModal()">
+  <div class="report-modal" (click)="$event.stopPropagation()">
+    <h3>Report Post</h3>
+    <p class="subtitle">
+      Why are you reporting this post?
+    </p>
+    <label *ngFor="let reason of reportReasons" class="reason-option">
+      <input type="radio" name="reason" [value]="reason" [(ngModel)]="selectedReason" />
+      {{ reason }}
+    </label>
+    <textarea *ngIf="selectedReason==='Other'" rows="4" [(ngModel)]="otherReason" placeholder="Describe the issue...">
+    </textarea>
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeReportModal()">
+        Cancel
+      </button>
+      <button class="submit-btn" (click)="submitReport()">
+        Report
+      </button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" *ngIf="deleteModalOpen" (click)="closeDeleteModal()">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-icon danger">
+      <i class="fa-solid fa-trash"></i>
+    </div>
+
+    <h3>Delete Comment?</h3>
+
+    <p>
+      This action cannot be undone. The comment will be permanently removed.
+    </p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeDeleteModal()">
+        Cancel
+      </button>
+
+      <button class="delete-btn" (click)="confirmDeleteComment()">
+        Delete
+      </button>
+    </div>
+
+  </div>
+</div>
+<div class="toast" *ngIf="toastVisible" [ngClass]="toastType">
+  <i class="fa-solid" [ngClass]="{
+      'fa-circle-check': toastType==='success',
+      'fa-circle-xmark': toastType==='error',
+      'fa-circle-exclamation': toastType==='warning'
+    }">
+  </i>
+  {{ toastMessage }}
+</div>
 <app-lightbox #lightbox></app-lightbox>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PostService } from '../../core/services/post.service';
@@ -7,10 +7,11 @@ import { Post, User } from '../../core/models/models';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
+import { LightboxComponent } from '../../shared/lightbox/lightbox.component';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LightboxComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -35,6 +36,20 @@ export class ProfileComponent implements OnInit {
     private confirmDialog: ConfirmDialogService,
   ) {}
 
+  @ViewChild('lightbox')
+  lightbox!: LightboxComponent;
+
+  openLightbox(post: any, selectedMedia: any) {
+    const images = post.mediaFiles
+      .filter((m: any) => m.type === 'image')
+      .map((m: any) => this.fileBase + m.url);
+
+    const index = post.mediaFiles
+      .filter((m: any) => m.type === 'image')
+      .findIndex((m: any) => m.url === selectedMedia.url);
+
+    this.lightbox.open(images, index);
+  }
   ngOnInit() {
     this.loadProfile();
     this.postService.getMyPosts().subscribe((res) => (this.posts = res.posts));

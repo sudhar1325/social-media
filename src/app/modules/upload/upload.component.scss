@@ -1,145 +1,1012 @@
-.wrap {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
+// =============================================================================
+// UPLOAD.SCSS — Angular Standalone Content Platform
+// Instagram + Reddit + Threads inspired · Modern SaaS · Glassmorphism · Premium
+// Styles ONLY existing markup — no invented HTML/classes.
+// =============================================================================
+
+@use 'sass:color';
+
+// -----------------------------------------------------------------------------
+// Variables
+// -----------------------------------------------------------------------------
+
+// ---- Colors ----
+$primary: #2563eb;
+$primary-hover: #1d4ed8;
+$success: #22c55e;
+$danger: #ef4444;
+$warning: #f59e0b;
+
+$background: #f8fafc;
+$surface: #ffffff;
+$border: #e2e8f0;
+
+$text: #0f172a;
+$muted: #64748b;
+
+// ---- Spacing ----
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+
+// ---- Radius ----
+$radius: 20px;
+$radius-sm: 12px;
+$radius-xs: 8px;
+$radius-full: 999px;
+
+// ---- Typography ----
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$fs-xs: 0.75rem;
+$fs-sm: 0.8125rem;
+$fs-base: 0.9375rem;
+$fs-md: 1rem;
+$fs-lg: 1.125rem;
+$fs-xl: 1.5rem;
+$fs-2xl: 1.875rem;
+
+// ---- Shadow ----
+$shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+$shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+$shadow-lg: 0 24px 55px rgba(15, 23, 42, 0.14);
+$shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.16);
+$shadow-focus-danger: 0 0 0 4px rgba(239, 68, 68, 0.16);
+$shadow-focus-success: 0 0 0 4px rgba(34, 197, 94, 0.16);
+$shadow-focus-warning: 0 0 0 4px rgba(245, 158, 11, 0.16);
+
+// ---- Transitions ----
+$transition: 250ms ease;
+$transition-fast: 150ms ease;
+$transition-spring: 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ---- Z-index ----
+$z-remove-btn: 5;
+$z-badge: 4;
+
+// ---- Breakpoints ----
+$breakpoints: (
+  xs: 360px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1440px
+);
+
+// -----------------------------------------------------------------------------
+// Mixins
+// -----------------------------------------------------------------------------
+
+@mixin respond-max($bp) {
+  @media (max-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
 }
-.card {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+
+@mixin respond-min($bp) {
+  @media (min-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
 }
-h2 {
-  margin: 0 0 0.2rem;
-  color: #14213d;
+
+@mixin glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: $radius;
+  box-shadow: $shadow;
 }
-textarea {
-  padding: 0.6rem 0.7rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font: inherit;
-  resize: vertical;
-}
-.file-label {
-  display: flex;
+
+@mixin primary-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  border: 1.5px dashed #aaa;
-  border-radius: 8px;
-  padding: 0.75rem;
-  font-size: 0.9rem;
-  color: #555;
+  gap: $space-2;
+  height: 50px;
+  padding-inline: $space-8;
+  border: none;
+  border-radius: $radius-sm;
+  background: linear-gradient(135deg, $primary, #6366f1);
+  color: #fff;
+  font-family: $font-family;
+  font-size: $fs-base;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: border-color 0.2s;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+  transition: background $transition-fast, box-shadow $transition-fast, transform $transition-fast;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 }
-.file-label:hover {
-  border-color: #14213d;
-  color: #14213d;
+
+@mixin secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  height: 44px;
+  padding-inline: $space-5;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: $text;
+  font-family: $font-family;
+  font-size: $fs-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
-.limits-hint {
-  font-size: 0.78rem;
-  color: #888;
-  margin: -0.3rem 0 0;
+
+@mixin input-style {
+  display: block;
+  width: 100%;
+  font-family: $font-family;
+  color: $text;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  outline: none;
+  transition: border-color $transition-fast, box-shadow $transition-fast, background $transition-fast;
+
+  &::placeholder {
+    color: $muted;
+  }
+
+  &:hover {
+    border-color: color.adjust($border, $lightness: -10%);
+  }
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: $shadow-focus;
+    background: $surface;
+  }
+
+  &:disabled {
+    background: rgba(148, 163, 184, 0.08);
+    color: $muted;
+    cursor: not-allowed;
+  }
+}
+
+@mixin scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: $border transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $border;
+    border-radius: $radius-full;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: color.adjust($border, $lightness: -12%);
+  }
+}
+
+@mixin card-hover {
+  transition: transform $transition, box-shadow $transition, border-color $transition;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin focus-ring($shadow: $shadow-focus) {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $shadow;
+  }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// -----------------------------------------------------------------------------
+// Keyframes
+// -----------------------------------------------------------------------------
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes rotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.28); }
+  50% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+}
+
+// -----------------------------------------------------------------------------
+// Global Wrapper — .wrap
+// -----------------------------------------------------------------------------
+
+.wrap {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding: $space-8 $space-4 $space-12;
+  background: $background;
+  min-height: 100vh;
+  font-family: $font-family;
+  color: $text;
+  animation: fadeIn $transition;
+
+  @include respond-max(md) {
+    padding: $space-6 $space-4 $space-10;
+  }
+
+  @include respond-max(sm) {
+    padding: $space-5 $space-3 $space-8;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Main Card — .card
+// -----------------------------------------------------------------------------
+
+.card {
+  @include glass-card;
+  @include card-hover;
+  padding: $space-10 $space-8;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  animation: slideUp $transition-spring;
+
+  @include respond-max(sm) {
+    padding: $space-6 $space-5;
+    border-radius: $radius-sm;
+  }
+
+  @include respond-max(xs) {
+    padding: $space-5 $space-4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Title — h2
+// -----------------------------------------------------------------------------
+
+.card h2,
+h2 {
+  position: relative;
+  font-size: $fs-2xl;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: $text;
+  margin-bottom: $space-2;
+  padding-bottom: $space-3;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 48px;
+    height: 4px;
+    border-radius: $radius-full;
+    background: linear-gradient(90deg, $primary, #6366f1);
+  }
+
+  @include respond-max(xs) {
+    font-size: $fs-xl;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Description Textarea
+// -----------------------------------------------------------------------------
+
+textarea {
+  @include input-style;
+  min-height: 70px;
+  padding: $space-4 $space-5;
+  font-size: $fs-base;
+  line-height: 1.6;
+  resize: vertical;
+  @include focus-ring;
+  @include scrollbar-thin;
+
+  &.invalid,
+  &.ng-invalid.ng-touched {
+    border-color: $danger;
+
+    &:focus {
+      box-shadow: $shadow-focus-danger;
+    }
+  }
+
+  @include respond-max(xs) {
+    min-height: 70px;
+    padding: $space-3 $space-4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Upload Area — .file-label
+// -----------------------------------------------------------------------------
+
+.file-label {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+  min-height: 50px;
+  padding: $space-4 $space-3;
+  border: 2px dashed color.adjust($border, $lightness: -6%);
+  border-radius: $radius;
+  background: linear-gradient(160deg, rgba(37, 99, 235, 0.04), rgba(99, 102, 241, 0.02));
+  color: $muted;
   text-align: center;
+  cursor: pointer;
+  transition: border-color $transition-fast, background $transition-fast, transform $transition-fast, box-shadow $transition-fast;
+  @include focus-ring;
+
+  svg,
+  .icon {
+    width: 44px;
+    height: 44px;
+    color: $primary;
+    animation: float 3.2s ease-in-out infinite;
+  }
+
+  strong {
+    font-size: $fs-base;
+    font-weight: 700;
+    color: $text;
+  }
+
+  span,
+  small {
+    font-size: $fs-sm;
+    color: $muted;
+  }
+
+  &:hover {
+    border-color: $primary;
+    background: linear-gradient(160deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.04));
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  &.dragover {
+    border-color: $primary;
+    border-style: solid;
+    background: linear-gradient(160deg, rgba(37, 99, 235, 0.1), rgba(99, 102, 241, 0.05));
+    box-shadow: $shadow-focus;
+    animation: glow 1.6s ease-in-out infinite;
+  }
+
+  @include respond-max(xs) {
+    min-height: 160px;
+    padding: $space-6 $space-4;
+
+    svg, .icon {
+      width: 36px;
+      height: 36px;
+    }
+  }
 }
+
+// -----------------------------------------------------------------------------
+// File Input — hidden, accessible
+// -----------------------------------------------------------------------------
+
+.file-label input[type='file'],
+input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+
+  &:focus-visible + strong,
+  &:focus-visible ~ strong {
+    text-decoration: underline;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Limits Hint — .limits-hint
+// -----------------------------------------------------------------------------
+
+.limits-hint {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: rgba(100, 116, 139, 0.06);
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+  color: $muted;
+  font-size: $fs-xs;
+  line-height: 1.5;
+
+  svg, .icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: $muted;
+  }
+
+  @include respond-max(xs) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-1;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Preview Grid — .previews
+// -----------------------------------------------------------------------------
+
 .previews {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.6rem;
+  gap: $space-4;
+  animation: fadeIn $transition;
+
+  @include respond-max(md) {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: $space-3;
+  }
+
+  @include respond-max(sm) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include respond-max(xs) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-2;
+  }
 }
+
+// -----------------------------------------------------------------------------
+// Preview Card — .preview-item
+// -----------------------------------------------------------------------------
+
 .preview-item {
   position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f0f0f0;
   aspect-ratio: 1;
-  border: 2px solid transparent;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid $border;
+  box-shadow: $shadow-sm;
+  animation: scaleIn $transition-spring;
+  transition: transform $transition, box-shadow $transition, border-color $transition;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(120deg, $primary, #6366f1, transparent 70%);
+    opacity: 0;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity $transition-fast;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: $shadow-lg;
+
+    &::after {
+      opacity: 1;
+    }
+
+    img, video {
+      transform: scale(1.06);
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Error Preview
+  // -----------------------------------------------------------------------
+  &.has-error {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.05);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    animation: scaleIn $transition-spring, glowError 1.8s ease-in-out infinite;
+  }
 }
-.preview-item.has-error {
-  border-color: #c0392b;
+
+@keyframes glowError {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.04); }
 }
+
+// -----------------------------------------------------------------------------
+// Image
+// -----------------------------------------------------------------------------
+
 .preview-item img,
-.preview-item video {
+img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 420ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+// -----------------------------------------------------------------------------
+// Video
+// -----------------------------------------------------------------------------
+
+.preview-item video,
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+  border-radius: inherit;
+  transition: transform 420ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::poster,
+  &[poster] {
+    object-fit: cover;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Remove Button — .remove-btn
+// -----------------------------------------------------------------------------
+
 .remove-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  top: $space-2;
+  right: $space-2;
+  z-index: $z-remove-btn;
+  width: 26px;
+  height: 26px;
   border: none;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  font-size: 0.7rem;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition: background $transition-fast, transform $transition-fast;
+  @include focus-ring;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    transition: transform $transition-fast;
+  }
+
+  &:hover {
+    background: $danger;
+    transform: scale(1.1) rotate(90deg);
+  }
+
+  &:active {
+    transform: scale(0.95) rotate(90deg);
+  }
 }
+
+// -----------------------------------------------------------------------------
+// Badges — .badge
+// -----------------------------------------------------------------------------
+
 .badge {
   position: absolute;
-  bottom: 4px;
-  left: 4px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: 0.65rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  text-transform: uppercase;
-  z-index: 2;
-}
-.badge.badge-error {
-  background: #c0392b;
-}
-.file-error {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(192, 57, 43, 0.88);
-  color: #fff;
-  font-size: 0.68rem;
-  padding: 0.3rem 0.4rem;
-  line-height: 1.3;
-  z-index: 2;
-}
-.category-input {
-  padding: 0.6rem 0.7rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font: inherit;
-}
-.hint {
-  font-size: 0.8rem;
-  color: #888;
-}
-.error {
-  color: #c0392b;
-  font-size: 0.85rem;
-}
-button {
-  background: #fca311;
-  color: #14213d;
-  border: none;
-  padding: 0.7rem;
-  border-radius: 6px;
+  top: $space-2;
+  left: $space-2;
+  z-index: $z-badge;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px $space-2;
+  border-radius: $radius-full;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: $shadow-sm;
+  color: $text;
+  font-size: 10px;
   font-weight: 700;
-  cursor: pointer;
-  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  // -----------------------------------------------------------------------
+  // .badge-error
+  // -----------------------------------------------------------------------
+  &-error {
+    background: rgba(239, 68, 68, 0.85);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fff;
+  }
 }
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+
+// -----------------------------------------------------------------------------
+// File Error — .file-error
+// -----------------------------------------------------------------------------
+
+.file-error {
+  padding: $space-2 $space-3;
+  margin-top: $space-1;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: $radius-xs;
+  color: $danger;
+  font-size: $fs-xs;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn $transition-fast;
+
+  @include respond-max(xs) {
+    font-size: 11px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Category Input — .category-input
+// -----------------------------------------------------------------------------
+
+.category-input {
+  @include input-style;
+  height: 48px;
+  padding-inline: $space-4;
+  font-size: $fs-base;
+  @include focus-ring;
+
+  &.invalid,
+  &.ng-invalid.ng-touched {
+    border-color: $danger;
+
+    &:focus {
+      box-shadow: $shadow-focus-danger;
+    }
+  }
+
+  &.valid,
+  &.ng-valid.ng-touched {
+    border-color: $success;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Help Text — .hint
+// -----------------------------------------------------------------------------
+
+.hint {
+  text-align: center;
+  color: $muted;
+  font-size: $fs-xs;
+  line-height: 1.6;
+  padding-inline: $space-4;
+
+  @include respond-max(xs) {
+    font-size: 11px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Error Message — .error
+// -----------------------------------------------------------------------------
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-radius: $radius-sm;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+  font-size: $fs-sm;
+  font-weight: 500;
+  line-height: 1.5;
+  animation: slideUp $transition-fast;
+
+  &::before {
+    content: '!';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: $danger;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Submit Button — button
+// -----------------------------------------------------------------------------
+
+button {
+  @include primary-button;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  @include focus-ring;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 600ms ease;
+  }
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $primary-hover, color.adjust(#6366f1, $lightness: -6%));
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.36);
+    transform: translateY(-1px);
+
+    &::before {
+      transform: translateX(120%);
+    }
+  }
+
+  &.loading {
+    color: transparent;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: rotate 0.7s linear infinite;
+    }
+  }
+
+  @include respond-max(xs) {
+    height: 46px;
+    font-size: $fs-sm;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Loading State
+// -----------------------------------------------------------------------------
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid $border;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: rotate 0.7s linear infinite;
+  margin-inline: auto;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: $radius-sm;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Empty States — reusable
+// -----------------------------------------------------------------------------
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: $space-4;
+  padding: $space-12 $space-6;
+  color: $muted;
+  animation: fadeIn $transition;
+
+  svg, .icon { width: 56px; height: 56px; color: $muted; opacity: 0.55; }
+  strong, h4 { font-size: $fs-md; font-weight: 700; color: $text; }
+  p, span { font-size: $fs-sm; color: $muted; max-width: 320px; }
+}
+
+// -----------------------------------------------------------------------------
+// Form Validation — Success / Warning states
+// -----------------------------------------------------------------------------
+
+input,
+textarea,
+.category-input {
+  &.warning {
+    border-color: $warning;
+
+    &:focus {
+      box-shadow: $shadow-focus-warning;
+    }
+  }
+
+  &.success,
+  &.valid {
+    border-color: $success;
+
+    &:focus {
+      box-shadow: $shadow-focus-success;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Scrollbar
+// -----------------------------------------------------------------------------
+
+.wrap {
+  @include scrollbar-thin;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: $text;
+}
+
+// -----------------------------------------------------------------------------
+// Responsive
+// -----------------------------------------------------------------------------
+
+// ---- 1440px ----
+@include respond-min(xxl) {
+  .wrap { max-width: 720px; }
+  .file-label { min-height: 220px; }
+}
+
+// ---- 1200px ----
+@include respond-max(xl) {
+  .wrap { max-width: 600px; }
+}
+
+// ---- 992px ----
+@include respond-max(lg) {
+  .card { padding: $space-8 $space-6; }
+  .previews { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+
+// ---- 768px ----
+@include respond-max(md) {
+  .card h2, h2 { font-size: $fs-xl; }
+  .limits-hint { font-size: 11px; }
+  .remove-btn { width: 24px; height: 24px; }
+}
+
+// ---- 576px ----
+@include respond-max(sm) {
+  .card { gap: $space-5; }
+  .file-label strong { font-size: $fs-sm; }
+  .badge { font-size: 9px; padding: 2px $space-2; }
+}
+
+// ---- 360px ----
+@include respond-max(xs) {
+  .wrap { padding: $space-4 $space-2 $space-6; }
+  .card { padding: $space-4 $space-3; border-radius: $radius-xs; }
+  .previews { gap: $space-2; }
+  .preview-item { border-radius: $radius-xs; }
+}
+
+// -----------------------------------------------------------------------------
+// Accessibility
+// -----------------------------------------------------------------------------
+
+.wrap :focus-visible {
+  outline: 2px solid $primary;
+  outline-offset: 2px;
+  border-radius: $radius-xs;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * , *::before, *::after {
+    animation-duration: 0.001ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.001ms;
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .card,
+  .file-label,
+  .preview-item,
+  input,
+  textarea,
+  .category-input {
+    border-width: 2px;
+  }
 }

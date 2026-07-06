@@ -39,8 +39,21 @@
       <span class="date">{{ post.createdAt | date: 'medium' }}</span>
     </div>
     <p class="desc" *ngIf="post.description">{{ post.description }}</p>
-    <img *ngIf="post.mediaType === 'image'" [src]="fileBase + post.mediaURL" />
-    <video *ngIf="post.mediaType === 'video'" [src]="fileBase + post.mediaURL" controls></video>
+    <div class="media-preview">
+      <div class="media-item" *ngFor="let media of post.mediaFiles">
+        <img
+          *ngIf="media.type === 'image'"
+          [src]="fileBase + media.url"
+          loading="lazy"
+          decoding="async"
+          (click)="openLightbox(post, media)" />
+
+    <video
+      *ngIf="media.type === 'video'"
+      [src]="fileBase + media.url"
+      preload="metadata"
+      controls>
+    </video>
     <p class="rejection" *ngIf="post.status === 'rejected'">
       Reason: {{ post.rejectionReason }}
     </p>
@@ -82,3 +95,4 @@
     </div>
   </div>
 </div>
+<app-lightbox #lightbox></app-lightbox>
